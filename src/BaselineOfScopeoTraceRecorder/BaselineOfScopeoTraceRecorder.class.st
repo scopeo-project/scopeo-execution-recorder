@@ -32,7 +32,7 @@ BaselineOfScopeoTraceRecorder >> dependencies: spec [
 { #category : #baselines }
 BaselineOfScopeoTraceRecorder >> packages: spec [
 
-		spec package: 'Scopeo-TraceRecorder-TestsObjects'.
+		spec package: 'Scopeo-TraceRecorder-TestObjects'.
 		spec
 			package: 'Scopeo-TraceRecorder'
 			with: [ spec requires: #( 'Scopeo-TraceRecorder-TestObjects' ) ]
