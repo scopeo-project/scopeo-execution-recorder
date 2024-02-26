@@ -16,7 +16,12 @@ BaselineOfScopeoTraceRecorder >> baseline: spec [
 { #category : #baselines }
 BaselineOfScopeoTraceRecorder >> dependencies: spec [
 
-		spec baseline: 'ScopeoInstrumentation' with: [
+
+	spec baseline: 'ScopeoCommon' with: [
+		spec repository:
+			'github://scopeo-project/scopeo-common:main' ].
+
+	spec baseline: 'ScopeoInstrumentation' with: [
 		spec repository:
 			'github://scopeo-project/scopeo-instrumentation:main' ].
 
