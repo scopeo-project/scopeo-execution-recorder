@@ -11,7 +11,9 @@ Class {
 { #category : #accessing }
 ScpTraceSourceBrowserItems >> classes [
 
-	^ self filter: (selection packages flatCollect: [ :p | p classes ])including: filter classes
+	^ self
+		  filter: (selection packages flatCollect: [ :p | p classes ]) asSet asOrderedCollection
+		  including: filter classes
 ]
 
 { #category : #parameters }
@@ -33,7 +35,11 @@ ScpTraceSourceBrowserItems >> filter: aCollection including: aString [
 { #category : #accessing }
 ScpTraceSourceBrowserItems >> methods [
 
-	^ self filter: (selection classes flatCollect: [ :c | c methods ]) including: filter methods
+	^ self
+		  filter:
+			  ((selection packages flatCollect: [ :p | p methods ]) select: [
+				   :m | selection classes includes: m methodClass ])
+		  including: filter methods
 ]
 
 { #category : #accessing }
