@@ -45,7 +45,7 @@ ScpTraceSourceBrowserItems >> methods [
 { #category : #accessing }
 ScpTraceSourceBrowserItems >> packages [
 
-	^ self filter: Smalltalk packages including: filter packages
+	^ self filter: Smalltalk packages asOrderedCollection including: filter packages
 ]
 
 { #category : #parameters }
