@@ -7,6 +7,12 @@ Class {
 	#category : #'Scopeo-TraceRecorder-Model'
 }
 
+{ #category : #converting }
+ScpMethodReturnTrace >> asString [
+
+	^ 'return ', value asString
+]
+
 { #category : #testing }
 ScpMethodReturnTrace >> isMethodReturn [
 

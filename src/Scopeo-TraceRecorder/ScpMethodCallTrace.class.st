@@ -34,6 +34,12 @@ ScpMethodCallTrace >> asString [
 { #category : #testing }
 ScpMethodCallTrace >> isMethodCall [
 
+	^ true
+]
+
+{ #category : #testing }
+ScpMethodCallTrace >> isSuperMethodCall [
+
 	^ false
 ]
 

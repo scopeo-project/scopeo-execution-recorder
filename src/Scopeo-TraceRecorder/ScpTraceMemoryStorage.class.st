@@ -17,11 +17,10 @@ ScpTraceMemoryStorage >> initialize [
 ScpTraceMemoryStorage >> onAssignment: aVariable of: anObject value: aValue [
 
 	traces add: (ScpAssignmentTrace new
-		variable: aVariable;
-		object: anObject;
-		value: aValue;
-		yourself
-	)
+			 variable: aVariable;
+			 object: anObject;
+			 value: aValue;
+			 yourself)
 ]
 
 { #category : #'events handling' }
@@ -40,6 +39,17 @@ ScpTraceMemoryStorage >> onMethodReturn: aValue [
 
 	traces add: (ScpMethodReturnTrace new
 			 value: aValue;
+			 yourself)
+]
+
+{ #category : #'as yet unclassified' }
+ScpTraceMemoryStorage >> onSuperCall: aSelector from: aSender with: anArguments [
+
+	traces add: (ScpSuperMethodCallTrace new
+			 selector: aSelector;
+			 receiver: aSender;
+			 sender: aSender;
+			 arguments: anArguments;
 			 yourself)
 ]
 

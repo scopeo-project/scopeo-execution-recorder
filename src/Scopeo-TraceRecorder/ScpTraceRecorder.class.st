@@ -43,7 +43,8 @@ ScpTraceRecorder >> initialize [
 { #category : #parameters }
 ScpTraceRecorder >> instrumentation: aInstrumentation [
 
-	instrumentation := aInstrumentation
+	instrumentation := aInstrumentation.
+	instrumentation handler: ScpInstrumentationHandler new
 ]
 
 { #category : #accessing }
