@@ -34,7 +34,7 @@ ScpMethodCallTrace >> asString [
 { #category : #testing }
 ScpMethodCallTrace >> isMethodCall [
 
-	^ true
+	^ false
 ]
 
 { #category : #accessing }

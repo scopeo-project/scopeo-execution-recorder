@@ -51,16 +51,22 @@ ScpTraceRecorderTest >> testExampleAccessorCall [
 	self assert: traces first receiver identicalTo: objectA.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectA.
 	self assert: traces second selector equals: #exampleAccessor.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments isEmpty equals: true.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectA.
+	self assert: traces third isMessageSend equals: true.
 	self assert: traces third selector equals: #exampleAccessor.
 	self assert: traces third receiver identicalTo: objectB.
 	self assert: traces third arguments isEmpty equals: true
+]
+
+{ #category : #tests }
+ScpTraceRecorderTest >> testExampleIfTrue [
+
+	self assert: objectA exampleIfTrue equals: true
 ]
 
 { #category : #tests }
@@ -84,14 +90,14 @@ ScpTraceRecorderTest >> testExampleSelfCall [
 	self assert: traces first receiver identicalTo: objectB.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectB.
 	self assert: traces second selector equals: #exampleSetter:.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
 	self assert: traces second arguments first equals: 'exampleSelf'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectB.
+	self assert: traces third isMessageSend equals: true.
 	self assert: traces third selector equals: #exampleSetter:.
 	self assert: traces third receiver identicalTo: objectB.
 	self assert: traces third arguments size equals: 1.
