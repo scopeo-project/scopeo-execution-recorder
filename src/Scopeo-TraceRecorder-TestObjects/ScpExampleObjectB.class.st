@@ -28,7 +28,7 @@ ScpExampleObjectB >> exampleSetter: aValue [
 
 { #category : #examples }
 ScpExampleObjectB >> exampleSetterObservableSlot: aValue [
-
+	
 	exampleInstanceObservable := aValue
 ]
 

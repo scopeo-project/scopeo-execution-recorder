@@ -17,34 +17,40 @@ ScpTraceMemoryStorage >> initialize [
 ScpTraceMemoryStorage >> onAssignment: aVariable of: anObject value: aValue [
 
 	traces add: (ScpAssignmentTrace new
-		variable: aVariable;
-		object: anObject;
-		value: aValue;
-		yourself
-	)
+			 variable: aVariable;
+			 object: anObject;
+			 value: aValue;
+			 yourself)
 ]
 
 { #category : #'events handling' }
-ScpTraceMemoryStorage >> onMessageSent: aSelector to: aReceiver with: aArguments [
+ScpTraceMemoryStorage >> onMethodCall: aMethodSelector from: aSender to: aReceiver with: aArguments [
 
-	traces add: (ScpMessageSendTrace new	
-		selector: aSelector;
-		receiver: aReceiver;
-		arguments: aArguments;
-		yourself
-	)
+	traces add: (ScpMethodCallTrace new
+			 selector: aMethodSelector;
+			 receiver: aReceiver;
+			 sender: aSender;
+			 arguments: aArguments;
+			 yourself)
 ]
 
 { #category : #'events handling' }
-ScpTraceMemoryStorage >> onMethodCall: aMethodSelector of: aReceiver from: aSender with: aArguments [
+ScpTraceMemoryStorage >> onMethodReturn: aValue [
 
-   traces add: (ScpMethodCallTrace new
-		selector: aMethodSelector;
-		receiver: aReceiver;
-		sender: aSender;
-		arguments: aArguments;
-		yourself
-	)
+	traces add: (ScpMethodReturnTrace new
+			 value: aValue;
+			 yourself)
+]
+
+{ #category : #'as yet unclassified' }
+ScpTraceMemoryStorage >> onSuperCall: aSelector from: aSender with: anArguments [
+
+	traces add: (ScpSuperMethodCallTrace new
+			 selector: aSelector;
+			 receiver: aSender;
+			 sender: aSender;
+			 arguments: anArguments;
+			 yourself)
 ]
 
 { #category : #accessing }

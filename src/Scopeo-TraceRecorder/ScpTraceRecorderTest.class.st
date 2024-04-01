@@ -44,23 +44,32 @@ ScpTraceRecorderTest >> testExampleAccessorCall [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 3.
+	self assert: traces size equals: 4.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self assert: traces first selector equals: #exampleAccessorCall.
 	self assert: traces first receiver identicalTo: objectA.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectA.
 	self assert: traces second selector equals: #exampleAccessor.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments isEmpty equals: true.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectA.
-	self assert: traces third selector equals: #exampleAccessor.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments isEmpty equals: true
+	self assert: traces third isMethodReturn equals: true.
+	self assert: traces third value equals: nil.
+	
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value equals: nil.
+
+
+]
+
+{ #category : #tests }
+ScpTraceRecorderTest >> testExampleIfTrue [
+
+	self assert: objectA exampleIfTrue equals: true
 ]
 
 { #category : #tests }
@@ -77,30 +86,30 @@ ScpTraceRecorderTest >> testExampleSelfCall [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 4.
+	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self assert: traces first selector equals: #exampleSelfCall.
 	self assert: traces first receiver identicalTo: objectB.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectB.
 	self assert: traces second selector equals: #exampleSetter:.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
 	self assert: traces second arguments first equals: 'exampleSelf'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectB.
-	self assert: traces third selector equals: #exampleSetter:.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments size equals: 1.
-	self assert: traces third arguments first equals: 'exampleSelf'.
+	self assert: traces third isAssignment equals: true.
+	self assert: traces third object identicalTo: objectB.
+	self assert: traces third variable equals: #exampleInstanceVariable.
+	self assert: traces third value equals: 'exampleSelf'.
+	
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value identicalTo: objectB.
 
-	self assert: traces fourth isAssignment equals: true.
-	self assert: traces fourth object identicalTo: objectB.
-	self assert: traces fourth variable equals: #exampleInstanceVariable.
-	self assert: traces fourth value equals: 'exampleSelf'
+	self assert: traces fifth isMethodReturn equals: true.
+	self assert: traces fifth value identicalTo: objectB.
 ]
 
 { #category : #tests }
@@ -111,30 +120,30 @@ ScpTraceRecorderTest >> testExampleSetterCall [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 4.
+	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self assert: traces first selector equals: #exampleSetterCall.
 	self assert: traces first receiver identicalTo: objectA.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectA.
 	self assert: traces second selector equals: #exampleSetter:.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
 	self assert: traces second arguments first equals: 'example'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectA.
-	self assert: traces third selector equals: #exampleSetter:.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments size equals: 1.
-	self assert: traces third arguments first equals: 'example'.
+	self assert: traces third isAssignment equals: true.
+	self assert: traces third object identicalTo: objectB.
+	self assert: traces third variable equals: #exampleInstanceVariable.
+	self assert: traces third value equals: 'example'.
 
-	self assert: traces fourth isAssignment equals: true.
-	self assert: traces fourth object identicalTo: objectB.
-	self assert: traces fourth variable equals: #exampleInstanceVariable.
-	self assert: traces fourth value equals: 'example'
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value identicalTo: objectB.
+
+	self assert: traces fifth isMethodReturn equals: true.
+	self assert: traces fifth value identicalTo: objectA
 ]
 
 { #category : #tests }
@@ -145,30 +154,30 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlock [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 4.
+	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self assert: traces first selector equals: #exampleSetterCallInBlock.
 	self assert: traces first receiver identicalTo: objectA.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectA.
 	self assert: traces second selector equals: #exampleSetter:.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
 	self assert: traces second arguments first equals: 'exampleInBlock'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectA.
-	self assert: traces third selector equals: #exampleSetter:.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments size equals: 1.
-	self assert: traces third arguments first equals: 'exampleInBlock'.
+	self assert: traces third isAssignment equals: true.
+	self assert: traces third object identicalTo: objectB.
+	self assert: traces third variable equals: #exampleInstanceVariable.
+	self assert: traces third value equals: 'exampleInBlock'.
 
-	self assert: traces fourth isAssignment equals: true.
-	self assert: traces fourth object identicalTo: objectB.
-	self assert: traces fourth variable equals: #exampleInstanceVariable.
-	self assert: traces fourth value equals: 'exampleInBlock'
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value identicalTo: objectB.
+
+	self assert: traces fifth isMethodReturn equals: true.
+	self assert: traces fifth value identicalTo: objectA
 ]
 
 { #category : #tests }
@@ -179,7 +188,7 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 4.
+	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self
@@ -188,7 +197,8 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 	self assert: traces first receiver identicalTo: objectA.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectA.
 	self assert: traces second selector equals: #exampleSetter:.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
@@ -196,19 +206,16 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 		assert: traces second arguments first
 		equals: 'exampleInBlockInBlock'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectA.
-	self assert: traces third selector equals: #exampleSetter:.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments size equals: 1.
-	self
-		assert: traces third arguments first
-		equals: 'exampleInBlockInBlock'.
+	self assert: traces third isAssignment equals: true.
+	self assert: traces third object identicalTo: objectB.
+	self assert: traces third variable equals: #exampleInstanceVariable.
+	self assert: traces third value equals: 'exampleInBlockInBlock'.
 
-	self assert: traces fourth isAssignment equals: true.
-	self assert: traces fourth object identicalTo: objectB.
-	self assert: traces fourth variable equals: #exampleInstanceVariable.
-	self assert: traces fourth value equals: 'exampleInBlockInBlock'
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value identicalTo: objectB.
+
+	self assert: traces fifth isMethodReturn equals: true.
+	self assert: traces fifth value identicalTo: objectA
 ]
 
 { #category : #tests }
@@ -219,7 +226,7 @@ ScpTraceRecorderTest >> testExampleSetterObservableCall [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 4.
+	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self
@@ -228,31 +235,25 @@ ScpTraceRecorderTest >> testExampleSetterObservableCall [
 	self assert: traces first receiver identicalTo: objectA.
 	self assert: traces first arguments isEmpty equals: true.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second sender identicalTo: objectA.
 	self
 		assert: traces second selector
 		equals: #exampleSetterObservableSlot:.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
-	self
-		assert: traces second arguments first
-		equals: 'exampleObservable'.
+	self assert: traces second arguments first equals: 'exampleObservable'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectA.
-	self
-		assert: traces third selector
-		equals: #exampleSetterObservableSlot:.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments size equals: 1.
-	self assert: traces third arguments first equals: 'exampleObservable'.
+	self assert: traces third isAssignment equals: true.
+	self assert: traces third object identicalTo: objectB.
+	self assert: traces third variable equals: #exampleInstanceObservable.
+	self assert: traces third value equals: 'exampleObservable'.
 
-	self assert: traces fourth isAssignment equals: true.
-	self assert: traces fourth object identicalTo: objectB.
-	self
-		assert: traces fourth variable
-		equals: #exampleInstanceObservable.
-	self assert: traces fourth value equals: 'exampleObservable'
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value identicalTo: objectB.
+
+	self assert: traces fifth isMethodReturn equals: true.
+	self assert: traces fifth value identicalTo: objectA
 ]
 
 { #category : #tests }
@@ -263,7 +264,7 @@ ScpTraceRecorderTest >> testExampleSuperCall [
 
 	traces := traceRecorder storage traces.
 
-	self assert: traces size equals: 3.
+	self assert: traces size equals: 4.
 	self assert: traces first isMethodCall equals: true.
 	self assert: traces first sender identicalTo: self.
 	self assert: traces first selector equals: #exampleSuperCall:.
@@ -271,16 +272,19 @@ ScpTraceRecorderTest >> testExampleSuperCall [
 	self assert: traces second arguments size equals: 1.
 	self assert: traces second arguments first equals: 'exampleSuper'.
 
-	self assert: traces second isMessageSend equals: true.
+	self assert: traces second isMethodCall equals: true.
+	self assert: traces second isSuperMethodCall equals: true.
 	self assert: traces second selector equals: #exampleSuperCall:.
+	self assert: traces second sender identicalTo: objectB.
 	self assert: traces second receiver identicalTo: objectB.
 	self assert: traces second arguments size equals: 1.
 	self assert: traces second arguments first equals: 'exampleSuper'.
+	
+	
+	self assert: traces third isMethodReturn equals: true.
+	self assert: traces third value equals: 'exampleSuper'.
+	
+	self assert: traces fourth isMethodReturn equals: true.
+	self assert: traces fourth value equals: 'exampleSuper'.
 
-	self assert: traces third isMethodCall equals: true.
-	self assert: traces third sender identicalTo: objectB.
-	self assert: traces third selector equals: #exampleSuperCall:.
-	self assert: traces third receiver identicalTo: objectB.
-	self assert: traces third arguments size equals: 1.
-	self assert: traces third arguments first equals: 'exampleSuper'
 ]

@@ -10,17 +10,25 @@ Class {
 { #category : #examples }
 ScpExampleObjectA >> exampleAccessorCall [
 
-	^ exampleObjectB exampleAccessor.
+	^ exampleObjectB exampleAccessor
+]
+
+{ #category : #'as yet unclassified' }
+ScpExampleObjectA >> exampleIfTrue [
+
+	| collection |
+	collection := OrderedCollection empty.
+	collection isEmpty ifTrue: [ ^ true ]
 ]
 
 { #category : #examples }
 ScpExampleObjectA >> exampleMethod [
 
 	exampleObjectB exampleSetter: 'example'.
-	
+
 	[ exampleObjectB exampleSetter: 'exampleInBlock' ] value.
-	
-	^ exampleObjectB exampleAccessor.
+
+	^ exampleObjectB exampleAccessor
 ]
 
 { #category : #accessing }
@@ -32,14 +40,13 @@ ScpExampleObjectA >> exampleObjectB: anObject [
 { #category : #examples }
 ScpExampleObjectA >> exampleSetterCall [
 
-	exampleObjectB exampleSetter: 'example' 
+	exampleObjectB exampleSetter: 'example'
 ]
 
 { #category : #examples }
 ScpExampleObjectA >> exampleSetterCallInBlock [
 
-	[ exampleObjectB exampleSetter: 'exampleInBlock' ] value.
-	
+	[ exampleObjectB exampleSetter: 'exampleInBlock' ] value
 ]
 
 { #category : #examples }
@@ -53,6 +60,5 @@ ScpExampleObjectA >> exampleSetterCallInBlockInBlock [
 { #category : #examples }
 ScpExampleObjectA >> exampleSetterObservableCall [
 
-	exampleObjectB exampleSetterObservableSlot: 'exampleObservable'.
-
+	 exampleObjectB exampleSetterObservableSlot: 'exampleObservable'
 ]

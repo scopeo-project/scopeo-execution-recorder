@@ -37,6 +37,12 @@ ScpMethodCallTrace >> isMethodCall [
 	^ true
 ]
 
+{ #category : #testing }
+ScpMethodCallTrace >> isSuperMethodCall [
+
+	^ false
+]
+
 { #category : #accessing }
 ScpMethodCallTrace >> receiver [
 
