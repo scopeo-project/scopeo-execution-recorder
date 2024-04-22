@@ -1,21 +1,23 @@
 Class {
-	#name : #ScpTraceRecorder,
-	#superclass : #Object,
+	#name : 'ScpTraceRecorder',
+	#superclass : 'Object',
 	#instVars : [
 		'instrumentation',
 		'storage',
 		'source'
 	],
-	#category : #'Scopeo-TraceRecorder-Model'
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 ScpTraceRecorder class >> defaultRejectedClasses [
 
 	^ {  }
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 ScpTraceRecorder class >> defaultRejectedPackages [
 
 	^ { 'Kernel'. 'Collections-Sequenceable-Tests'.
@@ -33,27 +35,27 @@ ScpTraceRecorder class >> defaultRejectedPackages [
 	  'Collections-DoubleLinkedList'. 'Transcript-Core' }
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceRecorder >> initialize [
 
 	self instrumentation: ScpInstrumentation new.
-	self storage: ScpTraceMemoryStorage new
+	self storage: ScpTraceArrayStorage new
 ]
 
-{ #category : #parameters }
+{ #category : 'parameters' }
 ScpTraceRecorder >> instrumentation: aInstrumentation [
 
 	instrumentation := aInstrumentation.
 	instrumentation handler: ScpInstrumentationHandler new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceRecorder >> source [
 
 	^ source
 ]
 
-{ #category : #parameters }
+{ #category : 'parameters' }
 ScpTraceRecorder >> source: aTraceSourceSelection [
 
 
@@ -61,7 +63,7 @@ ScpTraceRecorder >> source: aTraceSourceSelection [
 	instrumentation methodsToInstrument: source methods.
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceRecorder >> startRecording [
 
 	storage ifNil: [
@@ -70,32 +72,32 @@ ScpTraceRecorder >> startRecording [
 	instrumentation handler: storage
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceRecorder >> stopRecording [
 
 	instrumentation handler: ScpInstrumentationHandler new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceRecorder >> storage [
 
 	^ storage
 ]
 
-{ #category : #parameters }
+{ #category : 'parameters' }
 ScpTraceRecorder >> storage: aStorage [
 
 	storage := aStorage
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceRecorder >> switchOff [
 
 	self stopRecording.
 	instrumentation uninstall
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceRecorder >> switchOn [
 
 	instrumentation install

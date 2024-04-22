@@ -1,34 +1,36 @@
 Class {
-	#name : #ScpTrace,
-	#superclass : #Object,
-	#category : #'Scopeo-TraceRecorder-Model'
+	#name : 'ScpTrace',
+	#superclass : 'Object',
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTrace class >> isAbstract [
 
 	^ self == ScpTrace
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTrace >> isAssignment [
 
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTrace >> isMethodCall [
 
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTrace >> isMethodReturn [
 
 	^ false
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 ScpTrace >> printOn: aStream [
 
 	aStream << self asString

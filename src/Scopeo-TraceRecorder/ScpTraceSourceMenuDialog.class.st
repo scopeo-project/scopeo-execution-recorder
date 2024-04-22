@@ -1,27 +1,29 @@
 Class {
-	#name : #ScpTraceSourceMenuDialog,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceMenuDialog',
+	#superclass : 'Object',
 	#instVars : [
 		'value',
 		'announcer',
 		'presenter'
 	],
-	#category : #'Scopeo-TraceRecorder-Source-Menu-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Menu-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Menu-UI'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenuDialog >> announcer [
 
 	^ announcer ifNil: [ announcer := Announcer new ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenuDialog >> cancel [
 
 	self announcer announce: ScpTraceSourceMenuDialogCancelEvent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenuDialog >> presenter [
 
 	^ presenter ifNil: [
@@ -30,13 +32,13 @@ ScpTraceSourceMenuDialog >> presenter [
 			               model: self ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenuDialog >> validate [
 
 	self announcer announce: (ScpTraceSourceMenuDialogValidateEvent new value: value; yourself)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenuDialog >> value: aValue [
 
 	value := aValue

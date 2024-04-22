@@ -1,29 +1,31 @@
 Class {
-	#name : #ScpTraceSourceBrowserFilter,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceBrowserFilter',
+	#superclass : 'Object',
 	#instVars : [
 		'packages',
 		'classes',
 		'methods',
 		'model'
 	],
-	#category : #'Scopeo-TraceRecorder-Source-Browser-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Browser-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Browser-UI'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> classes [
 
 	^ classes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> classes: anObject [
 
 	classes := anObject.
 	model announceUpdate.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserFilter >> initialize [
 
 	packages := String empty.
@@ -31,32 +33,32 @@ ScpTraceSourceBrowserFilter >> initialize [
 	methods := String empty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> methods [
 
 	^ methods
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> methods: anObject [
 
 	methods := anObject.
 	model announceUpdate
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> model: aScpTraceSourceBrowserPresentationModel [
 
 	model := aScpTraceSourceBrowserPresentationModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> packages [
 
 	^ packages
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserFilter >> packages: anObject [
 
 	packages := anObject.

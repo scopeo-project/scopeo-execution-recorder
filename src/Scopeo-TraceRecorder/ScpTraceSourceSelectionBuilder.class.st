@@ -1,15 +1,17 @@
 Class {
-	#name : #ScpTraceSourceSelectionBuilder,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceSelectionBuilder',
+	#superclass : 'Object',
 	#instVars : [
 		'packageMatcher',
 		'methodMatcher',
 		'classMatcher'
 	],
-	#category : #'Scopeo-TraceRecorder-Model'
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceSourceSelectionBuilder >> build [
 
 	| selection |
@@ -22,7 +24,7 @@ ScpTraceSourceSelectionBuilder >> build [
 	^ selection
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceSelectionBuilder >> initialize [
 
 	self matchPackages: OTAnyMatcher new.
@@ -30,37 +32,37 @@ ScpTraceSourceSelectionBuilder >> initialize [
 	self matchMethods: OTAnyMatcher new
 ]
 
-{ #category : #parameters }
+{ #category : 'parameters' }
 ScpTraceSourceSelectionBuilder >> matchClasses: aClassMatcher [
 
 	classMatcher := aClassMatcher
 ]
 
-{ #category : #parameters }
+{ #category : 'parameters' }
 ScpTraceSourceSelectionBuilder >> matchMethods: aMethodMatcher [
 
 	methodMatcher := aMethodMatcher
 ]
 
-{ #category : #parameters }
+{ #category : 'parameters' }
 ScpTraceSourceSelectionBuilder >> matchPackages: aPackageMatcher [
 
 	packageMatcher := aPackageMatcher 
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScpTraceSourceSelectionBuilder >> selectClassesOf: aPackage [
 
 	^ aPackage classes select: [ :c | classMatcher matches: c ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScpTraceSourceSelectionBuilder >> selectMethodsOf: aClass [
 
 	^ aClass methods select: [ :m | methodMatcher matches: m ]
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScpTraceSourceSelectionBuilder >> selectPackages: aCollection [
 
 	^ aCollection select: [ :p | packageMatcher matches: p ]

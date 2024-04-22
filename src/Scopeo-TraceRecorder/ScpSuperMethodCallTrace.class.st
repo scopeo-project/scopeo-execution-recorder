@@ -1,16 +1,18 @@
 Class {
-	#name : #ScpSuperMethodCallTrace,
-	#superclass : #ScpMethodCallTrace,
-	#category : #'Scopeo-TraceRecorder-Model'
+	#name : 'ScpSuperMethodCallTrace',
+	#superclass : 'ScpMethodCallTrace',
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #printing }
+{ #category : 'printing' }
 ScpSuperMethodCallTrace >> asString [
 
 	^ 'super: ', super asString
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpSuperMethodCallTrace >> isSuperMethodCall [
 
 	^ true

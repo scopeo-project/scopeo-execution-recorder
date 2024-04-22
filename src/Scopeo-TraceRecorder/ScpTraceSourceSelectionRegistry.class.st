@@ -1,6 +1,6 @@
 Class {
-	#name : #ScpTraceSourceSelectionRegistry,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceSelectionRegistry',
+	#superclass : 'Object',
 	#instVars : [
 		'announcer',
 		'selections'
@@ -8,34 +8,36 @@ Class {
 	#classInstVars : [
 		'instance'
 	],
-	#category : #'Scopeo-TraceRecorder-Model'
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceSelectionRegistry class >> instance [
 
 	^ instance ifNil: [ instance := self new ]
 ]
 
-{ #category : #event }
+{ #category : 'event' }
 ScpTraceSourceSelectionRegistry >> announceUpdate [
 
 	self announcer announce: ScpTraceSourceSelectionRegistryEvent 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceSelectionRegistry >> announcer [
 
 	^ announcer ifNil: [ announcer := Announcer new ]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 ScpTraceSourceSelectionRegistry >> at: aName [
 
 	^ selections at: aName ifAbsent: [ nil ]
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 ScpTraceSourceSelectionRegistry >> at: aName put: aSelection [
 
 	selections at: aName ifPresent: [
@@ -46,20 +48,20 @@ ScpTraceSourceSelectionRegistry >> at: aName put: aSelection [
 	self announceUpdate
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceSelectionRegistry >> initialize [
 
 	selections := Dictionary new
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 ScpTraceSourceSelectionRegistry >> remove: aName [
 
 	selections removeKey: aName ifAbsent: [ ^ self ].
 	self announceUpdate
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceSelectionRegistry >> selections [
 
 	^ selections

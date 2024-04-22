@@ -1,28 +1,30 @@
 Class {
-	#name : #ScpMethodCallTrace,
-	#superclass : #ScpTrace,
+	#name : 'ScpMethodCallTrace',
+	#superclass : 'ScpTrace',
 	#instVars : [
 		'sender',
 		'selector',
 		'receiver',
 		'arguments'
 	],
-	#category : #'Scopeo-TraceRecorder-Model'
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> arguments [
 
 	^ arguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> arguments: anObject [
 
 	arguments := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 ScpMethodCallTrace >> asString [
 
 	^ sender asString 
@@ -31,49 +33,49 @@ ScpMethodCallTrace >> asString [
 		, ' with ', arguments asString
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpMethodCallTrace >> isMethodCall [
 
 	^ true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpMethodCallTrace >> isSuperMethodCall [
 
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> receiver [
 
 	^ receiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> receiver: anObject [
 
 	receiver := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> selector [
 
 	^ selector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> selector: anObject [
 
 	selector := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> sender [
 
 	^ sender
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodCallTrace >> sender: anObject [
 
 	sender := anObject

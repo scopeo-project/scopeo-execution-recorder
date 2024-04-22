@@ -1,6 +1,6 @@
 Class {
-	#name : #ScpTraceSourceBrowserPresenter,
-	#superclass : #SpPresenter,
+	#name : 'ScpTraceSourceBrowserPresenter',
+	#superclass : 'SpPresenter',
 	#instVars : [
 		'model',
 		'packageTable',
@@ -21,10 +21,12 @@ Class {
 		'validateButton',
 		'cancelButton'
 	],
-	#category : #'Scopeo-TraceRecorder-Source-Browser-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Browser-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Browser-UI'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> connectPresenters [
 
 	model announcer
@@ -34,11 +36,13 @@ ScpTraceSourceBrowserPresenter >> connectPresenters [
 
 	model announcer
 		when: ScpTraceSourceBrowserValidateEvent
-		do: [ self window close ].
+		do: [ self window close ]
+		for: self.
 
 	model announcer
 		when: ScpTraceSourceBrowserCancelEvent
-		do: [ self window close ].
+		do: [ self window close ]
+		for: self.
 
 
 	packagesFilterInput whenTextChangedDo: [ :t |
@@ -61,7 +65,7 @@ ScpTraceSourceBrowserPresenter >> connectPresenters [
 	cancelButton action: [ model cancel ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
@@ -115,7 +119,7 @@ ScpTraceSourceBrowserPresenter >> defaultLayout [
 		  yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> initializeButtonsPresenters [
 
 	validateButton := self newButton
@@ -170,7 +174,7 @@ ScpTraceSourceBrowserPresenter >> initializeButtonsPresenters [
 		                            yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> initializeFilterPresenters [
 
 	packagesFilterInput := self newTextInput 
@@ -184,7 +188,7 @@ ScpTraceSourceBrowserPresenter >> initializeFilterPresenters [
 		yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> initializePresenters [
 
 	self initializeTablePresenters.
@@ -195,7 +199,7 @@ ScpTraceSourceBrowserPresenter >> initializePresenters [
 	
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> initializeTablePresenters [
 
 	packageTable := self newTable
@@ -252,7 +256,7 @@ ScpTraceSourceBrowserPresenter >> initializeTablePresenters [
 		               yourself.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserPresenter >> initializeWindow: aWindowPresenter [
 
 	aWindowPresenter title: 'Scopeo trace source browser'.
@@ -260,7 +264,7 @@ ScpTraceSourceBrowserPresenter >> initializeWindow: aWindowPresenter [
 	aWindowPresenter whenClosedDo: [ model cancel ]
 ]
 
-{ #category : #refreshing }
+{ #category : 'refreshing' }
 ScpTraceSourceBrowserPresenter >> refresh [
 
 	packageTable items: model items packages.
@@ -272,7 +276,7 @@ ScpTraceSourceBrowserPresenter >> refresh [
 		ifFalse: [ validateButton disable ]
 ]
 
-{ #category : #'accessing - model' }
+{ #category : 'accessing - model' }
 ScpTraceSourceBrowserPresenter >> setModelBeforeInitialization: aModel [
 
 	model := aModel
