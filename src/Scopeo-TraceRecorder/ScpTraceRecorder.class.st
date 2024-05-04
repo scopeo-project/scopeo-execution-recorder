@@ -39,7 +39,7 @@ ScpTraceRecorder class >> defaultRejectedPackages [
 ScpTraceRecorder >> initialize [
 
 	self instrumentation: ScpInstrumentation new.
-	self storage: ScpTraceArrayStorage new
+	self storage: ScpTraceStore new
 ]
 
 { #category : 'parameters' }

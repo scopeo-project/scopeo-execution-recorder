@@ -74,10 +74,11 @@ ScpTraceSourceMenu >> edit [
 		do: [ :e |
 			source packages: e selection packages.
 			source classes: e selection classes.
-			source methods: e selection methods ].
-	
+			source methods: e selection methods ]
+		for: self.
+
 	browser traceSourceSelection: source.
-		
+
 	browser presenter open
 ]
 

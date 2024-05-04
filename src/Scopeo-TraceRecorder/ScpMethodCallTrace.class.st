@@ -7,9 +7,9 @@ Class {
 		'receiver',
 		'arguments'
 	],
-	#category : 'Scopeo-TraceRecorder-Model',
+	#category : 'Scopeo-TraceRecorder-old',
 	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Model'
+	#tag : 'old'
 }
 
 { #category : 'accessing' }

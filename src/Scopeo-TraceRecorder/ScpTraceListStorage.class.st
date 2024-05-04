@@ -44,7 +44,7 @@ ScpTraceListStorage >> onMethodReturn: aValue [
 			 yourself)
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'events handling' }
 ScpTraceListStorage >> onSuperCall: aSelector from: aSender with: anArguments [
 
 	traces add: (ScpSuperMethodCallTrace new
