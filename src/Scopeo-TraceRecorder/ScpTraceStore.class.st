@@ -85,7 +85,7 @@ ScpTraceStore >> onSuperCall: aMethodSelector from: aSender with: aArguments [
 	store subject: index predicate: #super object: true.
 	store subject: index predicate: #sender object: aSender hash.
 	store subject: index predicate: #selector object: aMethodSelector.
-	aArguments arguments do: [ :a | 
+	aArguments do: [ :a | 
 		store subject: index predicate: #argument object: a.			
 	].
 ]
