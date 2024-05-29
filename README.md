@@ -59,3 +59,11 @@ traceRecorder switchOn.
 traceRecorder startRecording.
 traceRecorder switchOff
 ```
+## Known issues
+
+Scenarios which can lead to a crashing image:
+- Trying to trace methods from Scopeo's packages.
+- Trying to trace methods that are specific to Pharo execution and that should not be rewritten/recompiled, such as:
+  - Methods from the `ProtoObject`.
+  - Reflective methods of `Object`, i.e. class, slots...
+  - Primitive methods.
