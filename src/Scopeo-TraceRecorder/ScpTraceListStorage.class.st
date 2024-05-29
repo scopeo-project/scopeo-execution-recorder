@@ -16,7 +16,18 @@ ScpTraceListStorage >> initialize [
 ]
 
 { #category : 'events handling' }
-ScpTraceListStorage >> onAssignment: aVariable of: anObject value: aValue [
+ScpTraceListStorage >> method: aSelector sender: aSender receiver: aReceiver arguments: anArguments [
+
+	traces add: (ScpMethodCallTrace new
+			 selector: aSelector;
+			 receiver: aReceiver;
+			 sender: aSender;
+			 arguments: anArguments;
+			 yourself)
+]
+
+{ #category : 'events handling' }
+ScpTraceListStorage >> node: aNodeId assignment: aVariable object: anObject value: aValue [
 
 	traces add: (ScpAssignmentTrace new
 			 variable: aVariable;
@@ -26,18 +37,18 @@ ScpTraceListStorage >> onAssignment: aVariable of: anObject value: aValue [
 ]
 
 { #category : 'events handling' }
-ScpTraceListStorage >> onMethodCall: aMethodSelector from: aSender to: aReceiver with: aArguments [
+ScpTraceListStorage >> node: aNodeId message: aSelector sender: aSender receiver: aReceiver arguments: anArguments [
 
 	traces add: (ScpMethodCallTrace new
-			 selector: aMethodSelector;
+			 selector: aSelector;
 			 receiver: aReceiver;
 			 sender: aSender;
-			 arguments: aArguments;
+			 arguments: anArguments;
 			 yourself)
 ]
 
 { #category : 'events handling' }
-ScpTraceListStorage >> onMethodReturn: aValue [
+ScpTraceListStorage >> node: aNodeId return: aValue [
 
 	traces add: (ScpMethodReturnTrace new
 			 value: aValue;
@@ -45,7 +56,7 @@ ScpTraceListStorage >> onMethodReturn: aValue [
 ]
 
 { #category : 'events handling' }
-ScpTraceListStorage >> onSuperCall: aSelector from: aSender with: anArguments [
+ScpTraceListStorage >> node: aNodeId super: aSelector sender: aSender arguments: anArguments [
 
 	traces add: (ScpSuperMethodCallTrace new
 			 selector: aSelector;
@@ -55,7 +66,7 @@ ScpTraceListStorage >> onSuperCall: aSelector from: aSender with: anArguments [
 			 yourself)
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'accessing' }
 ScpTraceListStorage >> traces [
 
 	^ traces
