@@ -1,17 +1,15 @@
 Class {
-	#name : 'ScpAssignmentTrace',
-	#superclass : 'ScpTrace',
+	#name : #ScpAssignmentTrace,
+	#superclass : #ScpTrace,
 	#instVars : [
 		'object',
 		'variable',
 		'value'
 	],
-	#category : 'Scopeo-TraceRecorder-Tests',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Tests'
+	#category : 'Scopeo-TraceRecorder-Tests'
 }
 
-{ #category : 'printing' }
+{ #category : #printing }
 ScpAssignmentTrace >> asString [
 
 	^ object asString 
@@ -19,43 +17,43 @@ ScpAssignmentTrace >> asString [
 		, ' := ' , value asString
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 ScpAssignmentTrace >> isAssignment [
 
 	^ true
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpAssignmentTrace >> object [
 
 	^ object
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpAssignmentTrace >> object: anObject [
 
 	object := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpAssignmentTrace >> value [
 
 	^ value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpAssignmentTrace >> value: anObject [
 
 	value := anObject
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpAssignmentTrace >> variable [
 
 	^ variable
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpAssignmentTrace >> variable: anObject [
 
 	variable := anObject

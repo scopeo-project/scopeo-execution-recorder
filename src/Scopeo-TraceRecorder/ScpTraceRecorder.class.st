@@ -49,25 +49,23 @@ Once the `ScpTraceRecorder` is set up, one must run it using following methods:
 
 "
 Class {
-	#name : 'ScpTraceRecorder',
-	#superclass : 'Object',
+	#name : #ScpTraceRecorder,
+	#superclass : #Object,
 	#instVars : [
 		'instrumentation',
-		'storage',
-		'source'
+		'source',
+		'handler'
 	],
-	#category : 'Scopeo-TraceRecorder-Model',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Model'
+	#category : #'Scopeo-TraceRecorder-Model'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 ScpTraceRecorder class >> defaultRejectedClasses [
 
 	^ {  }
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 ScpTraceRecorder class >> defaultRejectedPackages [
 
 	^ { 'Kernel'. 'Collections-Sequenceable-Tests'.
@@ -85,27 +83,38 @@ ScpTraceRecorder class >> defaultRejectedPackages [
 	  'Collections-DoubleLinkedList'. 'Transcript-Core' }
 ]
 
-{ #category : 'initialization' }
-ScpTraceRecorder >> initialize [
+{ #category : #accessing }
+ScpTraceRecorder >> handler [
 
-	self instrumentation: ScpInstrumentation new.
-	self storage: ScpTraceStore new
+	^ handler
 ]
 
-{ #category : 'parameters' }
+{ #category : #parameters }
+ScpTraceRecorder >> handler: aHandler [
+
+	handler := aHandler
+]
+
+{ #category : #initialization }
+ScpTraceRecorder >> initialize [
+
+	self instrumentation: ScpInstrumentation new
+]
+
+{ #category : #parameters }
 ScpTraceRecorder >> instrumentation: aInstrumentation [
 
 	instrumentation := aInstrumentation.
 	instrumentation handler: ScpInstrumentationHandler new
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceRecorder >> source [
 
 	^ source
 ]
 
-{ #category : 'parameters' }
+{ #category : #parameters }
 ScpTraceRecorder >> source: aTraceSourceSelection [
 
 
@@ -113,41 +122,29 @@ ScpTraceRecorder >> source: aTraceSourceSelection [
 	instrumentation methodsToInstrument: source methods.
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 ScpTraceRecorder >> startRecording [
 
-	storage ifNil: [
+	handler ifNil: [
 		self error: 'Please provide a storage component to record program events.'
 	].
-	instrumentation handler: storage
+	instrumentation handler: handler
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 ScpTraceRecorder >> stopRecording [
 
 	instrumentation handler: ScpInstrumentationHandler new
 ]
 
-{ #category : 'accessing' }
-ScpTraceRecorder >> storage [
-
-	^ storage
-]
-
-{ #category : 'parameters' }
-ScpTraceRecorder >> storage: aStorage [
-
-	storage := aStorage
-]
-
-{ #category : 'services' }
+{ #category : #services }
 ScpTraceRecorder >> switchOff [
 
 	self stopRecording.
 	instrumentation uninstall
 ]
 
-{ #category : 'services' }
+{ #category : #services }
 ScpTraceRecorder >> switchOn [
 
 	instrumentation install

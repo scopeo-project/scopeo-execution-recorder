@@ -1,16 +1,14 @@
 Class {
-	#name : 'ScpTraceSourceBrowserItems',
-	#superclass : 'Object',
+	#name : #ScpTraceSourceBrowserItems,
+	#superclass : #Object,
 	#instVars : [
 		'filter',
 		'selection'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Browser-UI',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Source-Browser-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Browser-UI'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowserItems >> classes [
 
 	^ self
@@ -18,13 +16,13 @@ ScpTraceSourceBrowserItems >> classes [
 		  including: filter classes
 ]
 
-{ #category : 'parameters' }
+{ #category : #parameters }
 ScpTraceSourceBrowserItems >> filter: aScpTraceSourceBrowserFilter [
 
 	filter := aScpTraceSourceBrowserFilter
 ]
 
-{ #category : 'private' }
+{ #category : #private }
 ScpTraceSourceBrowserItems >> filter: aCollection including: aString [
 
 	^ aCollection select: [ :e |
@@ -34,7 +32,7 @@ ScpTraceSourceBrowserItems >> filter: aCollection including: aString [
 				  caseSensitive: false ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowserItems >> methods [
 
 	^ self
@@ -44,13 +42,13 @@ ScpTraceSourceBrowserItems >> methods [
 		  including: filter methods
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowserItems >> packages [
 
 	^ self filter: Smalltalk packages asOrderedCollection including: filter packages
 ]
 
-{ #category : 'parameters' }
+{ #category : #parameters }
 ScpTraceSourceBrowserItems >> selection: aScpTraceSourceBrowserSelection [
 
 	selection := aScpTraceSourceBrowserSelection

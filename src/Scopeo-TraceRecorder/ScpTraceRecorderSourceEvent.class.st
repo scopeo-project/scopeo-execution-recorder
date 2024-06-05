@@ -1,21 +1,19 @@
 Class {
-	#name : 'ScpTraceRecorderSourceEvent',
-	#superclass : 'Announcement',
+	#name : #ScpTraceRecorderSourceEvent,
+	#superclass : #Announcement,
 	#instVars : [
 		'source'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Recorder-UI',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Source-Recorder-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Recorder-UI'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceRecorderSourceEvent >> source [
 
 	^ source
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceRecorderSourceEvent >> source: anObject [
 
 	source := anObject

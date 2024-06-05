@@ -1,6 +1,6 @@
 Class {
-	#name : 'ScpTraceSourceMenuDialogPresenter',
-	#superclass : 'SpPresenter',
+	#name : #ScpTraceSourceMenuDialogPresenter,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'label',
 		'nameTextField',
@@ -8,12 +8,10 @@ Class {
 		'cancelButton',
 		'model'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Menu-UI',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Source-Menu-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Menu-UI'
 }
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceSourceMenuDialogPresenter >> connectPresenters [
 
 	model announcer
@@ -31,7 +29,7 @@ ScpTraceSourceMenuDialogPresenter >> connectPresenters [
 	cancelButton action: [ model cancel ]
 ]
 
-{ #category : 'layout' }
+{ #category : #layout }
 ScpTraceSourceMenuDialogPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
@@ -49,7 +47,7 @@ ScpTraceSourceMenuDialogPresenter >> defaultLayout [
 		  yourself
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceSourceMenuDialogPresenter >> initializePresenters [
 
 	label := self newLabel
@@ -68,7 +66,7 @@ ScpTraceSourceMenuDialogPresenter >> initializePresenters [
 		                yourself
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceSourceMenuDialogPresenter >> initializeWindow: aWindowPresenter [
 
 	aWindowPresenter title: 'Scopeo source trace name'.
@@ -76,7 +74,7 @@ ScpTraceSourceMenuDialogPresenter >> initializeWindow: aWindowPresenter [
 	aWindowPresenter whenClosedDo: [ model cancel ]
 ]
 
-{ #category : 'accessing - model' }
+{ #category : #'accessing - model' }
 ScpTraceSourceMenuDialogPresenter >> setModelBeforeInitialization: aModel [
 
 	model := aModel

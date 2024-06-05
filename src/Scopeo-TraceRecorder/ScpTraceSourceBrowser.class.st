@@ -1,6 +1,6 @@
 Class {
-	#name : 'ScpTraceSourceBrowser',
-	#superclass : 'Object',
+	#name : #ScpTraceSourceBrowser,
+	#superclass : #Object,
 	#instVars : [
 		'items',
 		'filter',
@@ -8,37 +8,35 @@ Class {
 		'announcer',
 		'presenter'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Browser-UI',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Source-Browser-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Browser-UI'
 }
 
-{ #category : 'event' }
+{ #category : #event }
 ScpTraceSourceBrowser >> announceUpdate [
 
 	self announcer announce: (ScpTraceSourceBrowserItemsUpdateEvent new items: items ; yourself)
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowser >> announcer [
 
 	^ announcer ifNil: [ announcer := Announcer new ]
 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowser >> cancel [
 
 	self announcer announce: ScpTraceSourceBrowserCancelEvent
 ]
 
-{ #category : 'event' }
+{ #category : #event }
 ScpTraceSourceBrowser >> filter [
 
 	^ filter
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceSourceBrowser >> initialize [
 
 	filter := ScpTraceSourceBrowserFilter new
@@ -55,26 +53,26 @@ ScpTraceSourceBrowser >> initialize [
 		         yourself
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowser >> items [
 
 	^ items
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowser >> presenter [
 
 	^ presenter ifNil: [ presenter := ScpTraceSourceBrowserPresenter newApplication: SpScopeoApplication new 
 	model: self ]
 ]
 
-{ #category : 'event' }
+{ #category : #event }
 ScpTraceSourceBrowser >> selection [
 
 	^ selection
 ]
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 ScpTraceSourceBrowser >> traceSourceSelection: aScpTraceSourceSelection [
 
 
@@ -87,7 +85,7 @@ ScpTraceSourceBrowser >> traceSourceSelection: aScpTraceSourceSelection [
 	self announceUpdate
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 ScpTraceSourceBrowser >> validate [
 
 	self announcer announce: (ScpTraceSourceBrowserValidateEvent new

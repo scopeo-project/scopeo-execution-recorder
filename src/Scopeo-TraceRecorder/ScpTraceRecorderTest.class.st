@@ -1,20 +1,19 @@
 Class {
-	#name : 'ScpTraceRecorderTest',
-	#superclass : 'TestCase',
+	#name : #ScpTraceRecorderTest,
+	#superclass : #TestCase,
 	#instVars : [
 		'traceRecorder',
 		'objectA',
 		'objectB'
 	],
-	#category : 'Scopeo-TraceRecorder-Tests',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Tests'
+	#category : #'Scopeo-TraceRecorder-Tests'
 }
 
-{ #category : 'running' }
+{ #category : #running }
 ScpTraceRecorderTest >> setUp [
 
 	| sourceBuilder |
+	
 	objectB := ScpExampleObjectB new.
 	objectA := ScpExampleObjectA new
 		           exampleObjectB: objectB;
@@ -26,13 +25,13 @@ ScpTraceRecorderTest >> setUp [
 
 	traceRecorder := ScpTraceRecorder new.
 	traceRecorder source: sourceBuilder build.
-	traceRecorder storage: ScpTraceListStorage new.
+	traceRecorder handler: ScpTraceListStorage new.
 
 	traceRecorder switchOn.
 	traceRecorder startRecording
 ]
 
-{ #category : 'running' }
+{ #category : #running }
 ScpTraceRecorderTest >> tearDown [
 
 	super tearDown.
@@ -40,13 +39,13 @@ ScpTraceRecorderTest >> tearDown [
 	traceRecorder switchOff
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleAccessorCall [
 
 	| traces |
 	objectA exampleAccessorCall.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 4.
 	self assert: traces first isMethodCall equals: true.
@@ -70,25 +69,25 @@ ScpTraceRecorderTest >> testExampleAccessorCall [
 
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleIfTrue [
 
 	self assert: objectA exampleIfTrue equals: true
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleMethod [
 
 	objectA exampleMethod
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleSelfCall [
 
 	| traces |
 	objectB exampleSelfCall.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
@@ -116,13 +115,13 @@ ScpTraceRecorderTest >> testExampleSelfCall [
 	self assert: traces fifth value identicalTo: objectB.
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleSetterCall [
 
 	| traces |
 	objectA exampleSetterCall.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
@@ -150,13 +149,13 @@ ScpTraceRecorderTest >> testExampleSetterCall [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleSetterCallInBlock [
 
 	| traces |
 	objectA exampleSetterCallInBlock.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
@@ -184,13 +183,13 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlock [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 
 	| traces |
 	objectA exampleSetterCallInBlockInBlock.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
@@ -222,13 +221,13 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleSetterObservableCall [
 
 	| traces |
 	objectA exampleSetterObservableCall.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 5.
 	self assert: traces first isMethodCall equals: true.
@@ -260,13 +259,13 @@ ScpTraceRecorderTest >> testExampleSetterObservableCall [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : 'tests' }
+{ #category : #tests }
 ScpTraceRecorderTest >> testExampleSuperCall [
 
 	| traces |
 	objectB exampleSuperCall: 'exampleSuper'.
 
-	traces := traceRecorder storage traces.
+	traces := traceRecorder handler traces.
 
 	self assert: traces size equals: 4.
 	self assert: traces first isMethodCall equals: true.

@@ -1,6 +1,6 @@
 Class {
-	#name : 'ScpTraceRecorderPresenter',
-	#superclass : 'SpPresenter',
+	#name : #ScpTraceRecorderPresenter,
+	#superclass : #SpPresenter,
 	#instVars : [
 		'onOffButton',
 		'recordButton',
@@ -8,12 +8,10 @@ Class {
 		'tracesButton',
 		'model'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Recorder-UI',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Source-Recorder-UI'
+	#category : #'Scopeo-TraceRecorder-Source-Recorder-UI'
 }
 
-{ #category : 'instance creation' }
+{ #category : #'instance creation' }
 ScpTraceRecorderPresenter class >> open [
 
 	^ (self newApplication: SpScopeoApplication new)
@@ -21,7 +19,7 @@ ScpTraceRecorderPresenter class >> open [
 		  yourself
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceRecorderPresenter >> connectPresenters [
 
 	model announcer
@@ -41,10 +39,10 @@ ScpTraceRecorderPresenter >> connectPresenters [
 	recordButton whenSwitchedOffDo: [ model stopRecording ].
 
 	sourceButton action: [ model source ].
-	tracesButton action: [ model storage ]
+	tracesButton action: [ model handler ]
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceRecorderPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
@@ -59,7 +57,7 @@ ScpTraceRecorderPresenter >> defaultLayout [
 		  spacing: 4; yourself
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceRecorderPresenter >> initializePresenters [
 
 	sourceButton := self newButton
@@ -89,14 +87,14 @@ ScpTraceRecorderPresenter >> initializePresenters [
 		                yourself
 ]
 
-{ #category : 'initialization' }
+{ #category : #initialization }
 ScpTraceRecorderPresenter >> initializeWindow: aWindowPresenter [
 
 	aWindowPresenter title: 'Scopeo trace recorder'.
 	aWindowPresenter initialExtent: 325 @ 175
 ]
 
-{ #category : 'accessing - model' }
+{ #category : #'accessing - model' }
 ScpTraceRecorderPresenter >> setModelBeforeInitialization: aModel [
 
 	model := aModel

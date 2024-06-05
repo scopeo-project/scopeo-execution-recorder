@@ -1,1 +1,1 @@
-Package { #name : 'Scopeo-TraceRecorder' }
+Package { #name : #'Scopeo-TraceRecorder' }
