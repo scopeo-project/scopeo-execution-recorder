@@ -62,3 +62,13 @@ ScpExampleObjectA >> exampleSetterObservableCall [
 
 	 exampleObjectB exampleSetterObservableSlot: 'exampleObservable'
 ]
+
+{ #category : #'as yet unclassified' }
+ScpExampleObjectA >> exampleWithCascade [
+
+	^ self 
+		exampleIfTrue; 
+		exampleMethod; 
+		exampleObjectB: 'test'; 
+		yourself.
+]
