@@ -1,15 +1,17 @@
 Class {
-	#name : #ScpTraceRecorderTest,
-	#superclass : #TestCase,
+	#name : 'ScpTraceRecorderTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'traceRecorder',
 		'objectA',
 		'objectB'
 	],
-	#category : #'Scopeo-TraceRecorder-Tests'
+	#category : 'Scopeo-TraceRecorder-Tests',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Tests'
 }
 
-{ #category : #running }
+{ #category : 'running' }
 ScpTraceRecorderTest >> setUp [
 
 	| sourceBuilder |
@@ -31,7 +33,7 @@ ScpTraceRecorderTest >> setUp [
 	traceRecorder startRecording
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 ScpTraceRecorderTest >> tearDown [
 
 	super tearDown.
@@ -39,7 +41,7 @@ ScpTraceRecorderTest >> tearDown [
 	traceRecorder switchOff
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleAccessorCall [
 
 	| traces |
@@ -69,19 +71,19 @@ ScpTraceRecorderTest >> testExampleAccessorCall [
 
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleIfTrue [
 
 	self assert: objectA exampleIfTrue equals: true
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleMethod [
 
 	objectA exampleMethod
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleSelfCall [
 
 	| traces |
@@ -115,7 +117,7 @@ ScpTraceRecorderTest >> testExampleSelfCall [
 	self assert: traces fifth value identicalTo: objectB.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleSetterCall [
 
 	| traces |
@@ -149,7 +151,7 @@ ScpTraceRecorderTest >> testExampleSetterCall [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleSetterCallInBlock [
 
 	| traces |
@@ -183,7 +185,7 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlock [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 
 	| traces |
@@ -221,7 +223,7 @@ ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleSetterObservableCall [
 
 	| traces |
@@ -259,7 +261,7 @@ ScpTraceRecorderTest >> testExampleSetterObservableCall [
 	self assert: traces fifth value identicalTo: objectA
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 ScpTraceRecorderTest >> testExampleSuperCall [
 
 	| traces |

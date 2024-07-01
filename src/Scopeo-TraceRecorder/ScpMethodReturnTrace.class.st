@@ -1,31 +1,33 @@
 Class {
-	#name : #ScpMethodReturnTrace,
-	#superclass : #ScpTrace,
+	#name : 'ScpMethodReturnTrace',
+	#superclass : 'ScpTrace',
 	#instVars : [
 		'value'
 	],
-	#category : 'Scopeo-TraceRecorder-Tests'
+	#category : 'Scopeo-TraceRecorder-Tests',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Tests'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 ScpMethodReturnTrace >> asString [
 
 	^ 'return ', value asString
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpMethodReturnTrace >> isMethodReturn [
 
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodReturnTrace >> value [
 
 	^ value
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpMethodReturnTrace >> value: anObject [
 
 	value := anObject

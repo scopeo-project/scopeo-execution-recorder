@@ -1,34 +1,36 @@
 Class {
-	#name : #ScpTraceSourceMenu,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceMenu',
+	#superclass : 'Object',
 	#instVars : [
 		'presenter',
 		'selections',
 		'selection',
 		'announcer'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Menu-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Menu-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Menu-UI'
 }
 
-{ #category : #event }
+{ #category : 'event' }
 ScpTraceSourceMenu >> announceUpdate [
 
 	self announcer announce: ScpTraceSourceMenuUpdateEvent
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenu >> announcer [
 
 	^ announcer ifNil: [ announcer := Announcer new ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenu >> cancel [
 
 	self announcer announce: ScpTraceSourceMenuCancelEvent
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceSourceMenu >> create [
 
 	| dialog |
@@ -40,7 +42,7 @@ ScpTraceSourceMenu >> create [
 	dialog presenter open
 ]
 
-{ #category : #private }
+{ #category : 'private' }
 ScpTraceSourceMenu >> createSource: aName [
 
 	| browser |
@@ -54,13 +56,13 @@ ScpTraceSourceMenu >> createSource: aName [
 	browser presenter open
 ]
 
-{ #category : #'submorphs - add/remove' }
+{ #category : 'submorphs - add/remove' }
 ScpTraceSourceMenu >> delete [
 
 	selections remove: selection
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceSourceMenu >> edit [
 
 	| browser source |
@@ -80,7 +82,7 @@ ScpTraceSourceMenu >> edit [
 	browser presenter open
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceMenu >> initialize [
 
 	selections := ScpTraceSourceSelectionRegistry instance.
@@ -90,25 +92,25 @@ ScpTraceSourceMenu >> initialize [
 		to: self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenu >> presenter [
 
 	^ presenter ifNil: [ presenter := ScpTraceSourceMenuPresenter newApplication: SpScopeoApplication new model: self ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenu >> selection: aSelection [
 
 	selection := aSelection
 ]
 
-{ #category : #services }
+{ #category : 'services' }
 ScpTraceSourceMenu >> selections [
 
 	^ selections selections keys
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenu >> validate [
 
 	self announcer announce: (ScpTraceSourceMenuValidateEvent new selection: (selections at: selection); yourself)

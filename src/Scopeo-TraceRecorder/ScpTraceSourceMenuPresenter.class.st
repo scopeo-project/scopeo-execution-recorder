@@ -1,6 +1,6 @@
 Class {
-	#name : #ScpTraceSourceMenuPresenter,
-	#superclass : #SpPresenter,
+	#name : 'ScpTraceSourceMenuPresenter',
+	#superclass : 'SpPresenter',
 	#instVars : [
 		'model',
 		'selections',
@@ -11,10 +11,12 @@ Class {
 		'cancelButton',
 		'validateButton'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Menu-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Menu-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Menu-UI'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceMenuPresenter >> connectPresenters [
 
 	model announcer
@@ -42,7 +44,7 @@ ScpTraceSourceMenuPresenter >> connectPresenters [
 	cancelButton action: [ model cancel ]
 ]
 
-{ #category : #layout }
+{ #category : 'layout' }
 ScpTraceSourceMenuPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
@@ -65,7 +67,7 @@ ScpTraceSourceMenuPresenter >> defaultLayout [
 		  yourself
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceMenuPresenter >> initializePresenters [
 
 	selectionList := self newList.
@@ -99,7 +101,7 @@ ScpTraceSourceMenuPresenter >> initializePresenters [
 	self refresh
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceMenuPresenter >> initializeWindow: aWindowPresenter [
 
 	aWindowPresenter title: 'Scopeo trace source menu'.
@@ -107,13 +109,13 @@ ScpTraceSourceMenuPresenter >> initializeWindow: aWindowPresenter [
 	aWindowPresenter whenClosedDo: [ model cancel ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceMenuPresenter >> refresh [
 
 	selectionList items: model selections
 ]
 
-{ #category : #'accessing - model' }
+{ #category : 'accessing - model' }
 ScpTraceSourceMenuPresenter >> setModelBeforeInitialization: aModel [
 
 	model := aModel

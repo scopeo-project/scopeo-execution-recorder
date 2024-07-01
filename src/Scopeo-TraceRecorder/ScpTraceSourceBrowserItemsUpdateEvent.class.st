@@ -1,19 +1,21 @@
 Class {
-	#name : #ScpTraceSourceBrowserItemsUpdateEvent,
-	#superclass : #Announcement,
+	#name : 'ScpTraceSourceBrowserItemsUpdateEvent',
+	#superclass : 'Announcement',
 	#instVars : [
 		'items'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Browser-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Browser-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Browser-UI'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserItemsUpdateEvent >> items [
 
 	^ items
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserItemsUpdateEvent >> items: aScpTraceSourceBrowserItems [
 
 	items := aScpTraceSourceBrowserItems

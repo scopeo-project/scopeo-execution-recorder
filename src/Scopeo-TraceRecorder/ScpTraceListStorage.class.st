@@ -1,19 +1,21 @@
 Class {
-	#name : #ScpTraceListStorage,
-	#superclass : #ScpInstrumentationHandler,
+	#name : 'ScpTraceListStorage',
+	#superclass : 'ScpInstrumentationHandler',
 	#instVars : [
 		'traces'
 	],
-	#category : 'Scopeo-TraceRecorder-Tests'
+	#category : 'Scopeo-TraceRecorder-Tests',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Tests'
 }
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceListStorage >> initialize [
 
 	traces := OrderedCollection new
 ]
 
-{ #category : #'events handling' }
+{ #category : 'events handling' }
 ScpTraceListStorage >> method: aSelector sender: aSender receiver: aReceiver arguments: anArguments [
 
 	traces add: (ScpMethodCallTrace new
@@ -24,7 +26,7 @@ ScpTraceListStorage >> method: aSelector sender: aSender receiver: aReceiver arg
 			 yourself)
 ]
 
-{ #category : #'events handling' }
+{ #category : 'events handling' }
 ScpTraceListStorage >> node: aNodeId assignment: aVariable object: anObject value: aValue [
 
 	traces add: (ScpAssignmentTrace new
@@ -34,7 +36,7 @@ ScpTraceListStorage >> node: aNodeId assignment: aVariable object: anObject valu
 			 yourself)
 ]
 
-{ #category : #'events handling' }
+{ #category : 'events handling' }
 ScpTraceListStorage >> node: aNodeId message: aSelector sender: aSender receiver: aReceiver arguments: anArguments [
 
 	traces add: (ScpMethodCallTrace new
@@ -45,7 +47,7 @@ ScpTraceListStorage >> node: aNodeId message: aSelector sender: aSender receiver
 			 yourself)
 ]
 
-{ #category : #'events handling' }
+{ #category : 'events handling' }
 ScpTraceListStorage >> node: aNodeId return: aValue [
 
 	traces add: (ScpMethodReturnTrace new
@@ -53,7 +55,7 @@ ScpTraceListStorage >> node: aNodeId return: aValue [
 			 yourself)
 ]
 
-{ #category : #'events handling' }
+{ #category : 'events handling' }
 ScpTraceListStorage >> node: aNodeId super: aSelector sender: aSender arguments: anArguments [
 
 	traces add: (ScpSuperMethodCallTrace new
@@ -64,7 +66,7 @@ ScpTraceListStorage >> node: aNodeId super: aSelector sender: aSender arguments:
 			 yourself)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceListStorage >> traces [
 
 	^ traces

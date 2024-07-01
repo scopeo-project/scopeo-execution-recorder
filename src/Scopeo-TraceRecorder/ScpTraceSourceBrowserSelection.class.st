@@ -1,16 +1,18 @@
 Class {
-	#name : #ScpTraceSourceBrowserSelection,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceBrowserSelection',
+	#superclass : 'Object',
 	#instVars : [
 		'packages',
 		'classes',
 		'methods',
 		'model'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Browser-UI'
+	#category : 'Scopeo-TraceRecorder-Source-Browser-UI',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Source-Browser-UI'
 }
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> buildTraceSourceSelection [
 
 	^ ScpTraceSourceSelection new
@@ -20,25 +22,25 @@ ScpTraceSourceBrowserSelection >> buildTraceSourceSelection [
 		                        yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> classes [
 
 	^ classes
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> classes: anObject [
 
 	classes := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTraceSourceBrowserSelection >> hasMethodsSelected [
 
 	^ methods isNotEmpty
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceBrowserSelection >> initialize [
 
 	
@@ -47,107 +49,107 @@ ScpTraceSourceBrowserSelection >> initialize [
 	methods := OrderedCollection empty
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> initializeFromTraceSourceSelection: aScpTraceSourceSelection [
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTraceSourceBrowserSelection >> isClassSelected: aClass [
 
 	^ classes includes: aClass
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTraceSourceBrowserSelection >> isMethodSelected: aMethod [
 
 	^ methods includes: aMethod
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 ScpTraceSourceBrowserSelection >> isPackageSelected: aPackage [
 
 	^ packages includes: aPackage
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> methods [
 
 	^ methods
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> methods: anObject [
 
 	methods := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> model [
 
 	^ model
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> model: aScpTraceSourceBrowserPresentationModel [
 
 	model := aScpTraceSourceBrowserPresentationModel
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> packages [
 
 	^ packages
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceBrowserSelection >> packages: anObject [
 
 	packages := anObject
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> selectAllClasses [
 
 	classes := model items classes.
 	model announceUpdate
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> selectAllMethods [
 
 	methods := model items methods.
 	model announceUpdate
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> selectAllPackages [
 
 	packages := model items packages.
 	model announceUpdate
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> selectClass: aClass [
 
 	classes add: aClass.
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> selectMethod: aMethod [
 
 	methods add: aMethod.
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> selectPackage: aPackage [
 
 	packages add: aPackage.
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> unselectAllClasses [
 
 	classes := OrderedCollection empty.
@@ -155,14 +157,14 @@ ScpTraceSourceBrowserSelection >> unselectAllClasses [
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> unselectAllMethods [
 
 	methods := OrderedCollection empty.
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> unselectAllPackages [
 
 	packages := OrderedCollection empty.
@@ -171,21 +173,21 @@ ScpTraceSourceBrowserSelection >> unselectAllPackages [
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> unselectClass: aClass [
 
 	classes remove: aClass.
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> unselectMethod: aMethod [
 
 	methods remove: aMethod.
 	model announceUpdate 
 ]
 
-{ #category : #actions }
+{ #category : 'actions' }
 ScpTraceSourceBrowserSelection >> unselectPackage: aPackage [
 
 	packages remove: aPackage.

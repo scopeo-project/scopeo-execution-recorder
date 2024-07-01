@@ -1,27 +1,29 @@
 Class {
-	#name : #ScpTraceSourceSelection,
-	#superclass : #Object,
+	#name : 'ScpTraceSourceSelection',
+	#superclass : 'Object',
 	#instVars : [
 		'packages',
 		'classes',
 		'methods'
 	],
-	#category : 'Scopeo-TraceRecorder-Model'
+	#category : 'Scopeo-TraceRecorder-Model',
+	#package : 'Scopeo-TraceRecorder',
+	#tag : 'Model'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceSelection >> classes [
 
 	^ classes
 ]
 
-{ #category : #modifying }
+{ #category : 'modifying' }
 ScpTraceSourceSelection >> classes: aCollection [
 
 	classes := aCollection asOrderedCollection
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpTraceSourceSelection >> initialize [
 
 	packages := OrderedCollection empty.
@@ -30,25 +32,25 @@ ScpTraceSourceSelection >> initialize [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceSelection >> methods [
 
 	^ methods
 ]
 
-{ #category : #modifying }
+{ #category : 'modifying' }
 ScpTraceSourceSelection >> methods: aCollection [
 
 	methods := aCollection asOrderedCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 ScpTraceSourceSelection >> packages [
 
 	^ packages
 ]
 
-{ #category : #modifying }
+{ #category : 'modifying' }
 ScpTraceSourceSelection >> packages: aCollection [
 
 	packages := aCollection asOrderedCollection 
