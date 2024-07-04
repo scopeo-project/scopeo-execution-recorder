@@ -5,7 +5,7 @@ Class {
 		'onOffButton',
 		'recordButton',
 		'sourceButton',
-		'tracesButton',
+		'processButton',
 		'model'
 	],
 	#category : 'Scopeo-TraceRecorder-Source-Recorder-UI',
@@ -41,7 +41,7 @@ ScpTraceRecorderPresenter >> connectPresenters [
 	recordButton whenSwitchedOffDo: [ model stopRecording ].
 
 	sourceButton action: [ model source ].
-	tracesButton action: [ model handler ]
+	processButton action: [ model process ]
 ]
 
 { #category : 'initialization' }
@@ -55,7 +55,7 @@ ScpTraceRecorderPresenter >> defaultLayout [
 				   beHomogeneous;
 				   spacing: 4;
 				   yourself);
-		  add: tracesButton expand: false;
+		  add: processButton expand: false;
 		  spacing: 4; yourself
 ]
 
@@ -84,8 +84,8 @@ ScpTraceRecorderPresenter >> initializePresenters [
 		                enabled: false;
 		                yourself.
 
-	tracesButton := self newButton
-		                label: 'Inspect traces';
+	processButton := self newButton
+		                label: 'Process traces';
 		                yourself
 ]
 

@@ -28,20 +28,28 @@ ScpTraceSourceSelection >> initialize [
 
 	packages := OrderedCollection empty.
 	classes := OrderedCollection empty.
-	methods := OrderedCollection empty
+	methods := Dictionary empty
 	
+]
+
+{ #category : 'accessing' }
+ScpTraceSourceSelection >> methodAt: aMethodName [
+
+	^ methods at: aMethodName ifAbsent: [ ^ nil ]
 ]
 
 { #category : 'accessing' }
 ScpTraceSourceSelection >> methods [
 
-	^ methods
+	^ methods values
 ]
 
 { #category : 'modifying' }
 ScpTraceSourceSelection >> methods: aCollection [
 
-	methods := aCollection asOrderedCollection
+	aCollection asOrderedCollection do: [ :m |
+		methods at: m selector put: m
+	]
 ]
 
 { #category : 'accessing' }

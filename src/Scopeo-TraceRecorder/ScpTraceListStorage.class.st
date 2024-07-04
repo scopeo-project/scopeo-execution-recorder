@@ -29,7 +29,7 @@ ScpTraceListStorage >> method: aSelector sender: aSender receiver: aReceiver arg
 { #category : 'events handling' }
 ScpTraceListStorage >> node: aNodeId assignment: aVariable object: anObject value: aValue [
 
-	traces add: (ScpAssignmentTrace new
+	traces add: (ScpStateUpdateTrace new
 			 variable: aVariable;
 			 object: anObject;
 			 value: aValue;

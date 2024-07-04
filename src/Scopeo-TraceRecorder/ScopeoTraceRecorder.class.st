@@ -18,14 +18,6 @@ ScopeoTraceRecorder >> announcer [
 ]
 
 { #category : 'accessing' }
-ScopeoTraceRecorder >> handler [
-
-	recorder ifNil: [ OrderedCollection empty inspect ].
-
-	recorder handler execution inspect
-]
-
-{ #category : 'accessing' }
 ScopeoTraceRecorder >> initialize [
 
 	recorder := ScpTraceRecorder new.
@@ -36,6 +28,14 @@ ScopeoTraceRecorder >> initialize [
 ScopeoTraceRecorder >> presenter [
 
 	^ presenter ifNil: [ presenter := ScpTraceRecorderPresenter newApplication: SpScopeoApplication new model: self  ]
+]
+
+{ #category : 'accessing' }
+ScopeoTraceRecorder >> process [
+
+	recorder ifNil: [ ^ self ].
+
+	recorder handler process
 ]
 
 { #category : 'accessing' }

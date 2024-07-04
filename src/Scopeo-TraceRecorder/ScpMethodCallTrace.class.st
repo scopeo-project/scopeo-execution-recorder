@@ -7,10 +7,33 @@ Class {
 		'receiver',
 		'arguments'
 	],
-	#category : 'Scopeo-TraceRecorder-Tests',
+	#category : 'Scopeo-TraceRecorder-Trace-Model',
 	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Tests'
+	#tag : 'Trace-Model'
 }
+
+{ #category : 'accessing' }
+ScpMethodCallTrace class >> fromTraces: aTraces startingAt: anIndex [
+
+	^ (super fromTraces: aTraces startingAt: anIndex)
+		ifNil: [  
+			(aTraces at: anIndex) ~~ #call ifTrue: [ ^ nil ].
+
+			self new
+				node: (aTraces at: anIndex + 1);
+				selector: (aTraces at: anIndex + 2);
+				sender: (aTraces at: anIndex + 3);
+				receiver: (aTraces at: anIndex + 4);
+				arguments: (aTraces at: anIndex + 5);
+				yourself
+		]
+]
+
+{ #category : 'adding' }
+ScpMethodCallTrace >> addToExecution: anExecution [
+
+	^ anExecution addMethodCall: self
+]
 
 { #category : 'accessing' }
 ScpMethodCallTrace >> arguments [
@@ -31,6 +54,12 @@ ScpMethodCallTrace >> asString [
 		, ' sent ', selector asString
 		, ' to ', receiver asString 
 		, ' with ', arguments asString
+]
+
+{ #category : 'testing' }
+ScpMethodCallTrace >> isExternalMethodCall [
+
+	^ false
 ]
 
 { #category : 'testing' }
@@ -79,4 +108,10 @@ ScpMethodCallTrace >> sender [
 ScpMethodCallTrace >> sender: anObject [
 
 	sender := anObject
+]
+
+{ #category : 'accessing' }
+ScpMethodCallTrace >> size [
+
+	^ 5
 ]

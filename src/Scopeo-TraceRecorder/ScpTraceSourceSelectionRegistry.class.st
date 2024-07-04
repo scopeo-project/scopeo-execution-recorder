@@ -63,13 +63,9 @@ ScpTraceSourceSelectionRegistry >> method: aMethodSelector of: aClass [
 	"
 	self flag: #todo. "TODO: since this method is called each time a call is made in the execution, this is highly inefficient."
 	
-	self selections do: [ :s | 
-		s methods detect: [ :m | m methodClass = aClass and: [ m selector = aMethodSelector ] ] 
-			ifFound: [ :m | ^ m ] 
-			ifNone: [ "Continue" ].
-	].
-
-	^ aClass lookupSelector: aMethodSelector
+	^ (self selections collect: [ :s | s methodAt: aMethodSelector]) 
+		detect: [ :m | m isNotNil and: [ m methodClass = aClass ] ] 
+		ifNone: [ aClass lookupSelector: aMethodSelector ]
 ]
 
 { #category : 'adding' }

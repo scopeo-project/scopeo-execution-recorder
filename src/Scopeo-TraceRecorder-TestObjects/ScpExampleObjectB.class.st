@@ -1,46 +1,122 @@
 Class {
-	#name : #ScpExampleObjectB,
-	#superclass : #ScpExampleObject,
+	#name : 'ScpExampleObjectB',
+	#superclass : 'ScpExampleObject',
 	#instVars : [
 		'#exampleInstanceVariable',
 		'#exampleInstanceObservable => ObservableSlot'
 	],
-	#category : #'Scopeo-TraceRecorder-TestObjects'
+	#category : 'Scopeo-TraceRecorder-TestObjects',
+	#package : 'Scopeo-TraceRecorder-TestObjects'
 }
 
-{ #category : #examples }
+{ #category : 'examples' }
 ScpExampleObjectB >> exampleAccessor [
 
-	^ exampleInstanceVariable
+	(ScpInstrumentationRegistry instance at: 12002304)
+		method: #exampleAccessor
+		sender: thisContext sender receiver
+		receiver: self
+		arguments: {  }.
+
+	^ (ScpInstrumentationRegistry instance at: 12002304)
+		  node: 1
+		  return: exampleInstanceVariable
+		  sender: thisContext sender receiver
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 ScpExampleObjectB >> exampleSelfCall [
 
-	^ self exampleSetter: 'exampleSelf'
+	(ScpInstrumentationRegistry instance at: 12002304)
+		method: #exampleSelfCall
+		sender: thisContext sender receiver
+		receiver: self
+		arguments: {  }.
+
+	^ (ScpInstrumentationRegistry instance at: 12002304)
+		  node: 1
+		  return: ((ScpInstrumentationRegistry instance at: 12002304)
+				   node: 2
+				   message: #exampleSetter:
+				   sender: self
+				   receiver: self
+				   arguments: { 'exampleSelf' })
+		  sender: thisContext sender receiver
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 ScpExampleObjectB >> exampleSetter: aValue [
 
-	exampleInstanceVariable := aValue
+	(ScpInstrumentationRegistry instance at: 12002304)
+		method: #exampleSetter:
+		sender: thisContext sender receiver
+		receiver: self
+		arguments: { aValue }.
+	(ScpInstrumentationRegistry instance at: 12002304)
+		node: 1
+		assignment: [ :v | exampleInstanceVariable := v ]
+		variable: #exampleInstanceVariable
+		object: self
+		value: aValue.
+	^ (ScpInstrumentationRegistry instance at: 12002304)
+		  node: 2
+		  return: self
+		  sender: thisContext sender receiver
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 ScpExampleObjectB >> exampleSetterObservableSlot: aValue [
-	
-	exampleInstanceObservable := aValue
+
+	(ScpInstrumentationRegistry instance at: 12002304)
+		method: #exampleSetterObservableSlot:
+		sender: thisContext sender receiver
+		receiver: self
+		arguments: { aValue }.
+	(ScpInstrumentationRegistry instance at: 12002304)
+		node: 1
+		assignment: [ :v | exampleInstanceObservable := v ]
+		variable: #exampleInstanceObservable
+		object: self
+		value: aValue.
+	^ (ScpInstrumentationRegistry instance at: 12002304)
+		  node: 2
+		  return: self
+		  sender: thisContext sender receiver
 ]
 
-{ #category : #examples }
+{ #category : 'examples' }
 ScpExampleObjectB >> exampleSuperCall: aValue [
 
 	^ super exampleSuperCall: aValue
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 ScpExampleObjectB >> initialize [
 
-	self class initializeSlots: self.
-	super initialize.
+	(ScpInstrumentationRegistry instance at: 12002304)
+		method: #initialize
+		sender: thisContext sender receiver
+		receiver: self
+		arguments: {  }.
+	(ScpInstrumentationRegistry instance at: 12002304)
+		node: 1
+		message: #initializeSlots:
+		sender: self
+		receiver: ((ScpInstrumentationRegistry instance at: 12002304)
+				 node: 2
+				 message: #class
+				 sender: self
+				 receiver: self
+				 arguments: {  })
+		arguments: { self }.
+	(ScpInstrumentationRegistry instance at: 12002304)
+		node: 3
+		super: #initialize
+		sender: self
+		arguments: {  }
+		class: ScpExampleObjectB.
+	^ (ScpInstrumentationRegistry instance at: 12002304)
+		  node: 4
+		  return: self
+		  sender: thisContext sender receiver
 ]
