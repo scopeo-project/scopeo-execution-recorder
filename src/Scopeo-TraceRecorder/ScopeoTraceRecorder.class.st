@@ -29,7 +29,7 @@ ScopeoTraceRecorder >> handler [
 ScopeoTraceRecorder >> initialize [
 
 	recorder := ScpTraceRecorder new.
-	recorder handler: ScpExecutionTraceHandler new.
+	recorder handler: ScpTraceHandler new
 ]
 
 { #category : 'accessing' }
