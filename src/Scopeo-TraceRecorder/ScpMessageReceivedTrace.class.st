@@ -1,15 +1,15 @@
 Class {
-	#name : 'ScpExternalMethodCallTrace',
-	#superclass : 'ScpMethodCallTrace',
+	#name : 'ScpMessageReceivedTrace',
+	#superclass : 'ScpMessageTrace',
 	#category : 'Scopeo-TraceRecorder-Trace-Model',
 	#package : 'Scopeo-TraceRecorder',
 	#tag : 'Trace-Model'
 }
 
 { #category : 'accessing' }
-ScpExternalMethodCallTrace class >> fromTraces: aTraces startingAt: anIndex [
+ScpMessageReceivedTrace class >> fromTraces: aTraces startingAt: anIndex [
 
-	(aTraces at: anIndex) ~~ #externalcall ifTrue: [ ^ nil ].
+	(aTraces at: anIndex) ~~ #received ifTrue: [ ^ nil ].
 
 	^ self new
 		selector: (aTraces at: anIndex + 1);
@@ -20,19 +20,19 @@ ScpExternalMethodCallTrace class >> fromTraces: aTraces startingAt: anIndex [
 ]
 
 { #category : 'adding' }
-ScpExternalMethodCallTrace >> addToExecution: anExecution [
+ScpMessageReceivedTrace >> addToExecution: anExecution [
 
-	^ anExecution addExternalMethodCall: self
+	^ anExecution addMessageReceived: self
 ]
 
 { #category : 'testing' }
-ScpExternalMethodCallTrace >> isExternalMethodCall [
+ScpMessageReceivedTrace >> isMessageReceived [
 
 	^ true
 ]
 
 { #category : 'accessing' }
-ScpExternalMethodCallTrace >> size [
+ScpMessageReceivedTrace >> size [
 
 	^ 4
 ]

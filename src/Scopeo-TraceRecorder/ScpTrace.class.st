@@ -36,13 +36,13 @@ ScpTrace >> isAssignment [
 ]
 
 { #category : 'testing' }
-ScpTrace >> isMethodCall [
+ScpTrace >> isMessage [
 
 	^ false
 ]
 
 { #category : 'testing' }
-ScpTrace >> isMethodReturn [
+ScpTrace >> isReturn [
 
 	^ false
 ]

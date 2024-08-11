@@ -21,7 +21,7 @@ ScopeoTraceRecorder >> announcer [
 ScopeoTraceRecorder >> initialize [
 
 	recorder := ScpTraceRecorder new.
-	recorder handler: ScpTraceHandler new
+	recorder handler: ScpTraceArrayHandler new
 ]
 
 { #category : 'accessing' }

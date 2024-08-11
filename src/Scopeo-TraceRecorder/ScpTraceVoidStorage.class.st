@@ -1,6 +1,6 @@
 Class {
 	#name : 'ScpTraceVoidStorage',
-	#superclass : 'ScpInstrumentationHandler',
+	#superclass : 'Object',
 	#category : 'Scopeo-TraceRecorder-Model',
 	#package : 'Scopeo-TraceRecorder',
 	#tag : 'Model'

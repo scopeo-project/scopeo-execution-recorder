@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpStateUpdateTrace',
+	#name : 'ScpAssignmentTrace',
 	#superclass : 'ScpTrace',
 	#instVars : [
 		'object',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : 'accessing' }
-ScpStateUpdateTrace class >> fromTraces: aTraces startingAt: anIndex [
+ScpAssignmentTrace class >> fromTraces: aTraces startingAt: anIndex [
 
 	(aTraces at: anIndex) ~~ #assignment ifTrue: [ ^ nil ].
 
@@ -25,13 +25,13 @@ ScpStateUpdateTrace class >> fromTraces: aTraces startingAt: anIndex [
 ]
 
 { #category : 'adding' }
-ScpStateUpdateTrace >> addToExecution: anExecution [
+ScpAssignmentTrace >> addToExecution: anExecution [
 
 	^ anExecution addStateUpdate: self
 ]
 
 { #category : 'printing' }
-ScpStateUpdateTrace >> asString [
+ScpAssignmentTrace >> asString [
 
 	^ object asString 
 		, ': ' , variable asString
@@ -39,49 +39,49 @@ ScpStateUpdateTrace >> asString [
 ]
 
 { #category : 'testing' }
-ScpStateUpdateTrace >> isAssignment [
+ScpAssignmentTrace >> isAssignment [
 
 	^ true
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> object [
+ScpAssignmentTrace >> object [
 
 	^ object
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> object: anObject [
+ScpAssignmentTrace >> object: anObject [
 
 	object := anObject
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> size [
+ScpAssignmentTrace >> size [
 
 	^ 4
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> value [
+ScpAssignmentTrace >> value [
 
 	^ value
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> value: anObject [
+ScpAssignmentTrace >> value: anObject [
 
 	value := anObject
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> variable [
+ScpAssignmentTrace >> variable [
 
 	^ variable
 ]
 
 { #category : 'accessing' }
-ScpStateUpdateTrace >> variable: anObject [
+ScpAssignmentTrace >> variable: anObject [
 
 	variable := anObject
 ]

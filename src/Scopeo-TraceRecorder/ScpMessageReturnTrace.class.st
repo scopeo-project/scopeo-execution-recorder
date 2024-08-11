@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpMethodReturnTrace',
+	#name : 'ScpMessageReturnTrace',
 	#superclass : 'ScpReturnTrace',
 	#category : 'Scopeo-TraceRecorder-Trace-Model',
 	#package : 'Scopeo-TraceRecorder',
@@ -7,9 +7,9 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
-ScpMethodReturnTrace class >> fromTraces: aTraces startingAt: anIndex [
+ScpMessageReturnTrace class >> fromTraces: aTraces startingAt: anIndex [
 
-	(aTraces at: anIndex) ~~ #methodReturn ifTrue: [ ^ nil ].
+	(aTraces at: anIndex) ~~ #messageReturn ifTrue: [ ^ nil ].
 
 	^ self new
 		node: (aTraces at: anIndex + 1);
@@ -18,19 +18,19 @@ ScpMethodReturnTrace class >> fromTraces: aTraces startingAt: anIndex [
 ]
 
 { #category : 'as yet unclassified' }
-ScpMethodReturnTrace >> addToExecution: anExecution [
+ScpMessageReturnTrace >> addToExecution: anExecution [
 
-	^ anExecution addMethodReturn: self
+	^ anExecution addMessageReturn: self
 ]
 
 { #category : 'as yet unclassified' }
-ScpMethodReturnTrace >> asString [
+ScpMessageReturnTrace >> asString [
 
-	^ 'method return ', object asString
+	^ 'message return ', object asString
 ]
 
 { #category : 'as yet unclassified' }
-ScpMethodReturnTrace >> isMethodReturn [
+ScpMessageReturnTrace >> isMessageReturn [
 
 	^ true
 ]

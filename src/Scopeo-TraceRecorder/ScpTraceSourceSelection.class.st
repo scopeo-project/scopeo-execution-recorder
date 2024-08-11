@@ -35,21 +35,23 @@ ScpTraceSourceSelection >> initialize [
 { #category : 'accessing' }
 ScpTraceSourceSelection >> methodAt: aMethodName [
 
+	"Unused method, to remove in the future"
+	
+	self flag: #deprecated.
+
 	^ methods at: aMethodName ifAbsent: [ ^ nil ]
 ]
 
 { #category : 'accessing' }
 ScpTraceSourceSelection >> methods [
 
-	^ methods values
+	^ methods
 ]
 
 { #category : 'modifying' }
 ScpTraceSourceSelection >> methods: aCollection [
 
-	aCollection asOrderedCollection do: [ :m |
-		methods at: m selector put: m
-	]
+	methods := aCollection asOrderedCollection
 ]
 
 { #category : 'accessing' }

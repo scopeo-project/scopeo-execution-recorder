@@ -3,31 +3,59 @@ Class {
 	#superclass : 'TestCase',
 	#instVars : [
 		'traceRecorder',
-		'objectA',
-		'objectB'
+		'instVar',
+		'observableInstVar'
 	],
 	#category : 'Scopeo-TraceRecorder-Tests',
 	#package : 'Scopeo-TraceRecorder',
 	#tag : 'Tests'
 }
 
+{ #category : 'initialization' }
+ScpTraceRecorderTest >> initialize [
+
+	self class initializeSlots: self.
+	super initialize
+	
+]
+
+{ #category : 'as yet unclassified' }
+ScpTraceRecorderTest >> pharoSyntaxExample: aNumber [
+
+	"A method that illustrate every part of Smalltalk syntax"
+	<menu>
+	
+	| y block |
+	y := self hash + super hash.
+	
+	true & false not & (nil isNil) ifTrue: [ 
+		block := [ instVar := aNumber].
+		observableInstVar := block value.
+	].
+
+	instVar = y ifTrue: [ ^ instVar ].
+
+	#($a #a 'a' 1  1.0) do: [ :each |
+		Transcript
+			show: (each class name);
+			show: (each printString);
+			show: ' '	
+	]	
+		
+]
+
 { #category : 'running' }
 ScpTraceRecorderTest >> setUp [
 
 	| sourceBuilder |
-	
-	objectB := ScpExampleObjectB new.
-	objectA := ScpExampleObjectA new
-		           exampleObjectB: objectB;
-		           yourself.
-
 	sourceBuilder := ScpTraceSourceSelectionBuilder new.
-	sourceBuilder matchPackages:
-		(OTMatcher name: ScpExampleObjectA package name).
+	sourceBuilder matchMethods: (
+		OTMatcher identicalTo: (self class >> #pharoSyntaxExample:)
+	).
 
 	traceRecorder := ScpTraceRecorder new.
 	traceRecorder source: sourceBuilder build.
-	traceRecorder handler: ScpTraceListStorage new.
+	traceRecorder handler: ScpTraceListHandler new.
 
 	traceRecorder switchOn.
 	traceRecorder startRecording
@@ -37,259 +65,169 @@ ScpTraceRecorderTest >> setUp [
 ScpTraceRecorderTest >> tearDown [
 
 	super tearDown.
+	
+	traceRecorder ifNil: [ ^ self ].
 	traceRecorder stopRecording.
 	traceRecorder switchOff
 ]
 
 { #category : 'tests' }
-ScpTraceRecorderTest >> testExampleAccessorCall [
+ScpTraceRecorderTest >> testInstVarAssignmentIn2Blocks [
 
-	| traces |
-	objectA exampleAccessorCall.
+	| trace |
 
-	traces := traceRecorder handler traces.
+	self pharoSyntaxExample: 42.
 
-	self assert: traces size equals: 4.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self assert: traces first selector equals: #exampleAccessorCall.
-	self assert: traces first receiver identicalTo: objectA.
-	self assert: traces first arguments isEmpty equals: true.
+	trace := 	self traces at: 18.
 
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second sender identicalTo: objectA.
-	self assert: traces second selector equals: #exampleAccessor.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments isEmpty equals: true.
+	self assert: trace isAssignment.
+	self assert: trace node identicalTo: 200.
+	self assert: trace object identicalTo: self.
+	self assert: trace variable identicalTo: #instVar.
+	self assert: trace value identicalTo: 42
+]
 
-	self assert: traces third isMethodReturn equals: true.
-	self assert: traces third value equals: nil.
+{ #category : 'tests' }
+ScpTraceRecorderTest >> testMessageSent [
+
+	| message return |
+
+	self pharoSyntaxExample: 42.
+
+	message := self traces at: 12.
+	return := self traces at: 13.
+
+	self assert: message isMessage.
+	self assert: message node identicalTo: 169.
+	self assert: message sender identicalTo: self.
+	self assert: message selector identicalTo: #isNil.
+	self assert: message receiver identicalTo: nil.
+	self assert: message arguments isEmpty.
 	
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value equals: nil.
-
-
+	self assert: return isReturn.
+	self assert: return isMessageReturn.
+	self assert: return node identicalTo: 169.
+	self assert: return object identicalTo: true
 ]
 
 { #category : 'tests' }
-ScpTraceRecorderTest >> testExampleIfTrue [
+ScpTraceRecorderTest >> testMessageSentInBlock [
 
-	self assert: objectA exampleIfTrue equals: true
-]
+	| message return |
 
-{ #category : 'tests' }
-ScpTraceRecorderTest >> testExampleMethod [
+	self pharoSyntaxExample: 42.
 
-	objectA exampleMethod
-]
+	message := self traces at: 17.
+	return := self traces at: 19.
 
-{ #category : 'tests' }
-ScpTraceRecorderTest >> testExampleSelfCall [
-
-	| traces |
-	objectB exampleSelfCall.
-
-	traces := traceRecorder handler traces.
-
-	self assert: traces size equals: 5.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self assert: traces first selector equals: #exampleSelfCall.
-	self assert: traces first receiver identicalTo: objectB.
-	self assert: traces first arguments isEmpty equals: true.
-
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second sender identicalTo: objectB.
-	self assert: traces second selector equals: #exampleSetter:.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self assert: traces second arguments first equals: 'exampleSelf'.
-
-	self assert: traces third isAssignment equals: true.
-	self assert: traces third object identicalTo: objectB.
-	self assert: traces third variable equals: #exampleInstanceVariable.
-	self assert: traces third value equals: 'exampleSelf'.
+	self assert: message isMessage.
+	self assert: message node identicalTo: 250.
+	self assert: message sender identicalTo: self.
+	self assert: message selector identicalTo: #value.
+	self assert: (message receiver isKindOf: FullBlockClosure).
+	self assert: message arguments isEmpty.
 	
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value identicalTo: objectB.
-
-	self assert: traces fifth isMethodReturn equals: true.
-	self assert: traces fifth value identicalTo: objectB.
+	self assert: return isReturn.
+	self assert: return isMessageReturn .
+	self assert: return node identicalTo: 250.
+	self assert: return object identicalTo: 42.
 ]
 
 { #category : 'tests' }
-ScpTraceRecorderTest >> testExampleSetterCall [
+ScpTraceRecorderTest >> testMessageSentToSelf [
 
-	| traces |
-	objectA exampleSetterCall.
+	| message return |
 
-	traces := traceRecorder handler traces.
+	self pharoSyntaxExample: 42.
 
-	self assert: traces size equals: 5.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self assert: traces first selector equals: #exampleSetterCall.
-	self assert: traces first receiver identicalTo: objectA.
-	self assert: traces first arguments isEmpty equals: true.
+	message := self traces at: 2.
+	return := self traces at: 3.
 
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second sender identicalTo: objectA.
-	self assert: traces second selector equals: #exampleSetter:.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self assert: traces second arguments first equals: 'example'.
-
-	self assert: traces third isAssignment equals: true.
-	self assert: traces third object identicalTo: objectB.
-	self assert: traces third variable equals: #exampleInstanceVariable.
-	self assert: traces third value equals: 'example'.
-
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value identicalTo: objectB.
-
-	self assert: traces fifth isMethodReturn equals: true.
-	self assert: traces fifth value identicalTo: objectA
-]
-
-{ #category : 'tests' }
-ScpTraceRecorderTest >> testExampleSetterCallInBlock [
-
-	| traces |
-	objectA exampleSetterCallInBlock.
-
-	traces := traceRecorder handler traces.
-
-	self assert: traces size equals: 5.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self assert: traces first selector equals: #exampleSetterCallInBlock.
-	self assert: traces first receiver identicalTo: objectA.
-	self assert: traces first arguments isEmpty equals: true.
-
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second sender identicalTo: objectA.
-	self assert: traces second selector equals: #exampleSetter:.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self assert: traces second arguments first equals: 'exampleInBlock'.
-
-	self assert: traces third isAssignment equals: true.
-	self assert: traces third object identicalTo: objectB.
-	self assert: traces third variable equals: #exampleInstanceVariable.
-	self assert: traces third value equals: 'exampleInBlock'.
-
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value identicalTo: objectB.
-
-	self assert: traces fifth isMethodReturn equals: true.
-	self assert: traces fifth value identicalTo: objectA
-]
-
-{ #category : 'tests' }
-ScpTraceRecorderTest >> testExampleSetterCallInBlockInBlock [
-
-	| traces |
-	objectA exampleSetterCallInBlockInBlock.
-
-	traces := traceRecorder handler traces.
-
-	self assert: traces size equals: 5.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self
-		assert: traces first selector
-		equals: #exampleSetterCallInBlockInBlock.
-	self assert: traces first receiver identicalTo: objectA.
-	self assert: traces first arguments isEmpty equals: true.
-
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second sender identicalTo: objectA.
-	self assert: traces second selector equals: #exampleSetter:.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self
-		assert: traces second arguments first
-		equals: 'exampleInBlockInBlock'.
-
-	self assert: traces third isAssignment equals: true.
-	self assert: traces third object identicalTo: objectB.
-	self assert: traces third variable equals: #exampleInstanceVariable.
-	self assert: traces third value equals: 'exampleInBlockInBlock'.
-
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value identicalTo: objectB.
-
-	self assert: traces fifth isMethodReturn equals: true.
-	self assert: traces fifth value identicalTo: objectA
-]
-
-{ #category : 'tests' }
-ScpTraceRecorderTest >> testExampleSetterObservableCall [
-
-	| traces |
-	objectA exampleSetterObservableCall.
-
-	traces := traceRecorder handler traces.
-
-	self assert: traces size equals: 5.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self
-		assert: traces first selector
-		equals: #exampleSetterObservableCall.
-	self assert: traces first receiver identicalTo: objectA.
-	self assert: traces first arguments isEmpty equals: true.
-
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second sender identicalTo: objectA.
-	self
-		assert: traces second selector
-		equals: #exampleSetterObservableSlot:.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self assert: traces second arguments first equals: 'exampleObservable'.
-
-	self assert: traces third isAssignment equals: true.
-	self assert: traces third object identicalTo: objectB.
-	self assert: traces third variable equals: #exampleInstanceObservable.
-	self assert: traces third value equals: 'exampleObservable'.
-
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value identicalTo: objectB.
-
-	self assert: traces fifth isMethodReturn equals: true.
-	self assert: traces fifth value identicalTo: objectA
-]
-
-{ #category : 'tests' }
-ScpTraceRecorderTest >> testExampleSuperCall [
-
-	| traces |
-	objectB exampleSuperCall: 'exampleSuper'.
-
-	traces := traceRecorder handler traces.
-
-	self assert: traces size equals: 4.
-	self assert: traces first isMethodCall equals: true.
-	self assert: traces first sender identicalTo: self.
-	self assert: traces first selector equals: #exampleSuperCall:.
-	self assert: traces first receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self assert: traces second arguments first equals: 'exampleSuper'.
-
-	self assert: traces second isMethodCall equals: true.
-	self assert: traces second isSuperMethodCall equals: true.
-	self assert: traces second selector equals: #exampleSuperCall:.
-	self assert: traces second sender identicalTo: objectB.
-	self assert: traces second receiver identicalTo: objectB.
-	self assert: traces second arguments size equals: 1.
-	self assert: traces second arguments first equals: 'exampleSuper'.
+	self assert: message isMessage.
+	self assert: message node identicalTo: 123.
+	self assert: message sender identicalTo: self.
+	self assert: message selector identicalTo: #hash.
+	self assert: message receiver identicalTo: self.
+	self assert: message arguments isEmpty.
 	
-	
-	self assert: traces third isMethodReturn equals: true.
-	self assert: traces third value equals: 'exampleSuper'.
-	
-	self assert: traces fourth isMethodReturn equals: true.
-	self assert: traces fourth value equals: 'exampleSuper'.
+	self assert: return isReturn.
+	self assert: return isMessageReturn.
+	self assert: return node identicalTo: 123.
+	self assert: return object identicalTo: self hash
+]
 
+{ #category : 'tests' }
+ScpTraceRecorderTest >> testMessageToSuper [
+
+	| message return |
+
+	self pharoSyntaxExample: 42.
+
+	message := self traces at: 4.
+	return := self traces at: 5.
+
+	self assert: message isMessage.
+	self assert: message isMessageToSuper.
+	self assert: message node identicalTo: 136.
+	self assert: message sender identicalTo: self.
+	self assert: message selector identicalTo: #hash.
+	self assert: message receiver identicalTo: self.
+	self assert: message arguments isEmpty.
+	
+	self assert: return isReturn.
+	self assert: return isMessageReturn.
+	self assert: return node identicalTo: 136.
+	self assert: return object identicalTo: self hash
+]
+
+{ #category : 'tests' }
+ScpTraceRecorderTest >> testMethodReturn [
+
+	| trace |
+
+	self pharoSyntaxExample: self hash * 2.
+	
+	trace := 	self traces last.
+	
+	self assert: trace isReturn.
+	self assert: trace isMethodReturn.
+	self assert: trace node identicalTo: 285.
+	self assert: trace object identicalTo: self hash * 2.	
+]
+
+{ #category : 'tests' }
+ScpTraceRecorderTest >> testMethodReturnSelfByDefault [
+
+	| trace |
+
+	self pharoSyntaxExample: 42.
+	
+	trace := 	self traces last.
+	
+	self assert: trace isReturn.
+	self assert: trace isMethodReturn.
+	self assert: trace node identicalTo: 0.
+	self assert: trace object identicalTo: self.	
+]
+
+{ #category : 'tests' }
+ScpTraceRecorderTest >> testObservableInstVarAssignmentInBlock [
+
+	| trace |
+
+	self pharoSyntaxExample: 42.
+
+	trace := 	self traces at: 20.
+
+	self assert: trace isAssignment.
+	self assert: trace node identicalTo: 223.
+	self assert: trace object identicalTo: self.
+	self assert: trace variable identicalTo: #observableInstVar.
+	self assert: trace value identicalTo: 42
+]
+
+{ #category : 'accessing' }
+ScpTraceRecorderTest >> traces [ 
+
+	^ traceRecorder handler traces
 ]

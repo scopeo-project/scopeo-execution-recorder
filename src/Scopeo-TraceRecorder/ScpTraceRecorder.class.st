@@ -53,8 +53,7 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'instrumentation',
-		'source',
-		'handler'
+		'source'
 	],
 	#category : 'Scopeo-TraceRecorder-Model',
 	#package : 'Scopeo-TraceRecorder',
@@ -88,26 +87,19 @@ ScpTraceRecorder class >> defaultRejectedPackages [
 { #category : 'accessing' }
 ScpTraceRecorder >> handler [
 
-	^ handler
+	^ instrumentation handler
 ]
 
 { #category : 'parameters' }
 ScpTraceRecorder >> handler: aHandler [
 
-	handler := aHandler
+	instrumentation handler: aHandler
 ]
 
 { #category : 'initialization' }
 ScpTraceRecorder >> initialize [
 
-	self instrumentation: ScpInstrumentation new
-]
-
-{ #category : 'parameters' }
-ScpTraceRecorder >> instrumentation: aInstrumentation [
-
-	instrumentation := aInstrumentation.
-	instrumentation handler: ScpInstrumentationHandler new
+	instrumentation := ScpInstrumentation new
 ]
 
 { #category : 'accessing' }
@@ -127,16 +119,13 @@ ScpTraceRecorder >> source: aTraceSourceSelection [
 { #category : 'services' }
 ScpTraceRecorder >> startRecording [
 
-	handler ifNil: [
-		self error: 'Please provide a storage component to record program events.'
-	].
-	instrumentation handler: handler
+	instrumentation enable
 ]
 
 { #category : 'services' }
 ScpTraceRecorder >> stopRecording [
 
-	instrumentation handler: ScpInstrumentationHandler new
+	instrumentation disable
 ]
 
 { #category : 'services' }

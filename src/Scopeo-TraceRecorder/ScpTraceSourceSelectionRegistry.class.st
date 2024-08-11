@@ -61,7 +61,7 @@ ScpTraceSourceSelectionRegistry >> method: aMethodSelector of: aClass [
 		This method retrieves a the original method that may have been rewritten by Scopeo.
 		If the method has not been part of Scopeo instrumentation, we look for the method in the Pharo system.
 	"
-	self flag: #todo. "TODO: since this method is called each time a call is made in the execution, this is highly inefficient."
+	self flag: #deprecated. "TODO: since this method is called each time a call is made in the execution, this is highly inefficient."
 	
 	^ (self selections collect: [ :s | s methodAt: aMethodSelector]) 
 		detect: [ :m | m isNotNil and: [ m methodClass = aClass ] ] 
