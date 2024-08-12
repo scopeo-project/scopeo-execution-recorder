@@ -1,6 +1,6 @@
 Class {
 	#name : 'ScpTraceListHandler',
-	#superclass : 'Object',
+	#superclass : 'ScpTraceRecorderHandler',
 	#instVars : [
 		'traces'
 	],
@@ -82,7 +82,7 @@ ScpTraceListHandler >> node: aNodeId super: aSelector sender: aSender arguments:
 { #category : 'accessing' }
 ScpTraceListHandler >> process [
 
-	^ traces
+	^ traces inspect
 ]
 
 { #category : 'accessing' }

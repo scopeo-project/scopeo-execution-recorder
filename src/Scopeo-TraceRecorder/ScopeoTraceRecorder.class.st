@@ -17,11 +17,23 @@ ScopeoTraceRecorder >> announcer [
 	 ^ announcer ifNil: [ announcer := Announcer new ]
 ]
 
+{ #category : 'parameters' }
+ScopeoTraceRecorder >> handler: aScpInstrumentationHandler [
+
+	"
+	Define a new instrumentation handler.
+	The latter is expected to implement a process message defining 
+	the behavior to execute on a click of the process traces button.
+	"
+
+	recorder handler: aScpInstrumentationHandler
+]
+
 { #category : 'accessing' }
 ScopeoTraceRecorder >> initialize [
 
 	recorder := ScpTraceRecorder new.
-	recorder handler: ScpTraceArrayHandler new
+	self handler: ScpTraceListHandler new
 ]
 
 { #category : 'accessing' }

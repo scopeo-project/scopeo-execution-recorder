@@ -103,6 +103,12 @@ ScpTraceRecorder >> initialize [
 ]
 
 { #category : 'accessing' }
+ScpTraceRecorder >> process [
+
+	^ self handler process
+]
+
+{ #category : 'accessing' }
 ScpTraceRecorder >> source [
 
 	^ source
