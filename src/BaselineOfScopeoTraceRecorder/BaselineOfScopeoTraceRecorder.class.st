@@ -1,11 +1,10 @@
 Class {
-	#name : 'BaselineOfScopeoTraceRecorder',
-	#superclass : 'BaselineOf',
-	#category : 'BaselineOfScopeoTraceRecorder',
-	#package : 'BaselineOfScopeoTraceRecorder'
+	#name : #BaselineOfScopeoTraceRecorder,
+	#superclass : #BaselineOf,
+	#category : #BaselineOfScopeoTraceRecorder
 }
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfScopeoTraceRecorder >> baseline: spec [
 
 	<baseline>
@@ -14,7 +13,7 @@ BaselineOfScopeoTraceRecorder >> baseline: spec [
 		self packages: spec ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfScopeoTraceRecorder >> dependencies: spec [
 
 
@@ -24,7 +23,7 @@ BaselineOfScopeoTraceRecorder >> dependencies: spec [
 
 	spec baseline: 'ScopeoInstrumentation' with: [
 		spec repository:
-			'github://scopeo-project/scopeo-instrumentation:v1.0' ].		
+			'github://scopeo-project/scopeo-instrumentation:v1.0.1' ].		
 	spec baseline: 'ScopeoStore' with: [
 		spec repository:
 			'github://scopeo-project/scopeo-store:main' ].
@@ -33,7 +32,7 @@ BaselineOfScopeoTraceRecorder >> dependencies: spec [
 		spec repository: 'github://Gabriel-Darbord/opentelemetry-pharo:main' ]
 ]
 
-{ #category : 'baselines' }
+{ #category : #baselines }
 BaselineOfScopeoTraceRecorder >> packages: spec [
 
 		spec package: 'Scopeo-TraceRecorder-TestObjects'.

@@ -1,1 +1,1 @@
-Package { #name : 'BaselineOfScopeoTraceRecorder' }
+Package { #name : #BaselineOfScopeoTraceRecorder }
