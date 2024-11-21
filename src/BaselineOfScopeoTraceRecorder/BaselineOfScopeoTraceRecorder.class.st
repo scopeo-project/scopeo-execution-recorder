@@ -24,8 +24,7 @@ BaselineOfScopeoTraceRecorder >> dependencies: spec [
 
 	spec baseline: 'ScopeoInstrumentation' with: [
 		spec repository:
-			'github://scopeo-project/scopeo-instrumentation:main' ].
-		
+			'github://scopeo-project/scopeo-instrumentation:v1.0' ].		
 	spec baseline: 'ScopeoStore' with: [
 		spec repository:
 			'github://scopeo-project/scopeo-store:main' ].
