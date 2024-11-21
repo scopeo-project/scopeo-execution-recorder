@@ -30,7 +30,7 @@ BaselineOfScopeoTraceRecorder >> dependencies: spec [
 		spec repository:
 			'github://scopeo-project/scopeo-store:main' ].
 
-	spec package: 'OpenTelemetry-Instrumentation-Matchers' with: [
+	spec package: 'OpenTelemetry-Matchers' with: [
 		spec repository: 'github://Gabriel-Darbord/opentelemetry-pharo:main' ]
 ]
 
