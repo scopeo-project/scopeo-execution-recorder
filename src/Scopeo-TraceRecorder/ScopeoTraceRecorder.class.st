@@ -2,91 +2,181 @@ Class {
 	#name : 'ScopeoTraceRecorder',
 	#superclass : 'Object',
 	#instVars : [
-		'presenter',
-		'recorder',
-		'announcer'
+		'instrumentationForMethod',
+		'instrumentationForMessage',
+		'instrumentationForAssignment',
+		'traces',
+		'handler',
+		'handlerForAssignment',
+		'handlerForMessage',
+		'instrumentations'
 	],
-	#category : 'Scopeo-TraceRecorder-Source-Recorder-UI',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Source-Recorder-UI'
+	#category : 'Scopeo-TraceRecorder',
+	#package : 'Scopeo-TraceRecorder'
 }
 
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> announcer [
+{ #category : 'services' }
+ScopeoTraceRecorder class >> traceBlock: aBlock [
 
-	 ^ announcer ifNil: [ announcer := Announcer new ]
+ 	| recorder method process  |
+	
+	recorder := self new.
+	
+	method := recorder trace: (Smalltalk compiler compile: (String streamContents: [:s |
+		s nextPutAll: 'scopeo'.
+		s nextPutAll: String cr.
+		s nextPutAll: aBlock sourceNode body formattedCode.
+	])).
+
+	process := [ self 
+		withArgs: #() 
+		executeMethod: method 
+	] newProcess.
+
+	recorder process: process.
+
+	process resume.
+	
+	recorder reset.
+	
+	^ recorder
+]
+
+{ #category : 'services' }
+ScopeoTraceRecorder class >> traceMethod: aMethod inProcess: aProcess [  
+		
+	^ self new 
+		trace: aMethod;
+		process: aProcess;
+		enable	
+	
+]
+
+{ #category : 'services' }
+ScopeoTraceRecorder class >> traceProcess: aProcess [  
+	
+	^ self traceMethod: aProcess suspendedContext method inProcess: aProcess
+]
+
+{ #category : 'private' }
+ScopeoTraceRecorder >> canInstrumentMethod: aMethod [
+
+	aMethod isInstrumented ifTrue: [ ^ false ].
+
+	aMethod methodClass = UndefinedObject ifFalse: [ 
+		(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ false ].
+		(aMethod package name beginsWith: #Collection) ifTrue: [ ^ false ].
+	].
+	
+	aMethod isPrimitive ifTrue: [ ^ false ].
+	(aMethod pragmaAt: #noInstrumentation) ifNotNil: [ ^ false ].
+	
+	^ true
+
+]
+
+{ #category : 'services' }
+ScopeoTraceRecorder >> disable [
+
+	handlerForAssignment disable.
+	handlerForMessage disable.
+	
+]
+
+{ #category : 'services' }
+ScopeoTraceRecorder >> enable [
+
+	handlerForAssignment enable.
+	handlerForMessage enable
+]
+
+{ #category : 'initialization' }
+ScopeoTraceRecorder >> initialize [
+
+	
+	handlerForAssignment := ScpBeforeHandler new.
+	handlerForMessage := ScpBeforeHandler new.
+
+	instrumentations := OrderedCollection new.
+
+	traces := OrderedCollection new.
+	
+	
+]
+
+{ #category : 'private' }
+ScopeoTraceRecorder >> instrumentationForAssignment [
+
+	^ instrumentationForAssignment ifNil: [ 
+		instrumentationForAssignment := ScpAssignmentInstrumentation new
+			handler: handlerForAssignment;
+			yourself
+	]
+]
+
+{ #category : 'private' }
+ScopeoTraceRecorder >> instrumentationForMessage [
+
+	^ instrumentationForMessage ifNil: [ 
+		instrumentationForMessage := ScpMessageInstrumentation new
+			handler: handlerForMessage;
+			yourself
+	]
+]
+
+{ #category : 'services' }
+ScopeoTraceRecorder >> isEnabled [
+
+	^ handlerForAssignment isEnabled 
 ]
 
 { #category : 'parameters' }
-ScopeoTraceRecorder >> handler: aScpInstrumentationHandler [
+ScopeoTraceRecorder >> process: aProcess [
 
-	"
-	Define a new instrumentation handler.
-	The latter is expected to implement a process message defining 
-	the behavior to execute on a click of the process traces button.
-	"
+	handlerForAssignment evaluate: [ :op | 
+		thisProcess == aProcess ifTrue: [ 
+			traces add: op
+		]
+	].
 
-	recorder handler: aScpInstrumentationHandler
+	handlerForMessage evaluate: [ :op |
+		thisProcess == aProcess ifTrue: [
+			"op crTrace."
+			self trace: (op receiver class lookupSelector: op selector).
+			self halt.
+			traces add: op
+		]
+	]
+
 ]
 
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> initialize [
-
-	recorder := ScpTraceRecorder new.
-	self handler: ScpTraceListHandler new
+{ #category : 'initialization' }
+ScopeoTraceRecorder >> reset [
+	self disable.
+	instrumentations do: [ :i | 
+		i uninstall 
+	]
 ]
 
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> presenter [
+{ #category : 'parameters' }
+ScopeoTraceRecorder >> trace: aMethod [
 
-	^ presenter ifNil: [ presenter := ScpTraceRecorderPresenter newApplication: SpScopeoApplication new model: self  ]
+	| instrumentation |
+
+	(self canInstrumentMethod: aMethod) ifFalse: [ ^ false ]. 
+	
+	instrumentation := aMethod instrumentation.
+	instrumentation register: self instrumentationForMessage.		
+	instrumentation register: self instrumentationForAssignment.
+	instrumentation install.
+	
+	instrumentations add: instrumentation.
+	
+	^ instrumentation methodModified
 ]
 
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> process [
+{ #category : 'services' }
+ScopeoTraceRecorder >> traces [
 
-	recorder ifNil: [ ^ self ].
-
-	recorder handler process
-]
-
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> source [
-
-	| sourceMenu |
-	sourceMenu := ScpTraceSourceMenu new.
-
-	sourceMenu announcer
-		when: ScpTraceSourceMenuValidateEvent
-		do: [ :e |
-			self announcer announce: (ScpTraceRecorderSourceEvent new
-					 source: e selection;
-					 yourself).
-			e selection ifNotNil: [ recorder source: e selection ] ]
-		for: self.
-
-	sourceMenu presenter open
-]
-
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> startRecording [
-
-	recorder startRecording
-]
-
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> stopRecording [
-
-	recorder stopRecording
-]
-
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> switchOff [
-	recorder switchOff
-]
-
-{ #category : 'accessing' }
-ScopeoTraceRecorder >> switchOn [
-
-	recorder switchOn
+	^ traces
 ]

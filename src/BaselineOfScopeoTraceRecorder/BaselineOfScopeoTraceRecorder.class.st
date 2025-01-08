@@ -17,20 +17,10 @@ BaselineOfScopeoTraceRecorder >> baseline: spec [
 { #category : 'baselines' }
 BaselineOfScopeoTraceRecorder >> dependencies: spec [
 
-
-	spec baseline: 'ScopeoCommon' with: [
-		spec repository:
-			'github://scopeo-project/scopeo-common:main' ].
-
 	spec baseline: 'ScopeoInstrumentation' with: [
-		spec repository:
-			'github://scopeo-project/scopeo-instrumentation:v1.0.2' ].		
-	spec baseline: 'ScopeoStore' with: [
-		spec repository:
-			'github://scopeo-project/scopeo-store:main' ].
-
-	spec package: 'OpenTelemetry-Matchers' with: [
-		spec repository: 'github://Gabriel-Darbord/opentelemetry-pharo:main' ]
+		spec repository: 'github://scopeo-project/scopeo-instrumentation:v2.0.0' 
+	].		
+	
 ]
 
 { #category : 'baselines' }
