@@ -2,21 +2,14 @@ Class {
 	#name : 'ScpMessageTrace',
 	#superclass : 'ScpTrace',
 	#instVars : [
-		'sender',
 		'selector',
+		'sender',
 		'receiver',
 		'arguments'
 	],
-	#category : 'Scopeo-TraceRecorder-Trace-Model',
-	#package : 'Scopeo-TraceRecorder',
-	#tag : 'Trace-Model'
+	#category : 'Scopeo-Execution-Recorder',
+	#package : 'Scopeo-Execution-Recorder'
 }
-
-{ #category : 'testing' }
-ScpMessageTrace class >> isAbstract [
-
-	^ self == ScpMessageTrace
-]
 
 { #category : 'accessing' }
 ScpMessageTrace >> arguments [
@@ -30,29 +23,8 @@ ScpMessageTrace >> arguments: anObject [
 	arguments := anObject
 ]
 
-{ #category : 'printing' }
-ScpMessageTrace >> asString [
-
-	^ sender asString 
-		, ' sent ', selector asString
-		, ' to ', receiver asString 
-		, ' with ', arguments asString
-]
-
 { #category : 'testing' }
-ScpMessageTrace >> isMessage [
-
-	^ true
-]
-
-{ #category : 'testing' }
-ScpMessageTrace >> isMessageReceived [
-
-	^ false
-]
-
-{ #category : 'testing' }
-ScpMessageTrace >> isMessageSent [
+ScpMessageTrace >> isMessageToSelf [
 
 	^ false
 ]
@@ -61,6 +33,17 @@ ScpMessageTrace >> isMessageSent [
 ScpMessageTrace >> isMessageToSuper [
 
 	^ false
+]
+
+{ #category : 'printing' }
+ScpMessageTrace >> printOn: aStream [
+
+	aStream 
+		<< 'Message: '
+		<< sender asString << String space
+		<< selector asString << String space
+		<< receiver asString << String space
+		<< arguments asString
 ]
 
 { #category : 'accessing' }
