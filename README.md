@@ -1,69 +1,67 @@
-# Scopeo trace recorder
+# Scopeo execution recorder
 
-Part of the Scopeo project (a back-in-time debugger), this trace recorder is a tool that allows one to select methods and trace their execution.  
+![Unit tests badge](https://img.shields.io/github/actions/workflow/status/scopeo-project/scopeo-execution-recorder/tests.yml?label=Unit%20tests&branch=main)
 
-## Installation
+A library to record a method execution in a given (or automatically created) process and reify it as a call graph in Pharo.
+
+## How to install?
 
 ```st
 Metacello new
-  githubUser: 'scopeo-project' project: 'scopeo-trace-recorder' commitish: 'main' path: 'src';
-  baseline: 'ScopeoTraceRecorder';
+  githubUser: 'scopeo-project' project: 'scopeo-execution-recorder'
+  commitish: 'main' path: 'src';
+  baseline: 'ScopeoExecutionRecorder';
   load
 ```
 
-## How to use it programmatically ?
+## How to use it?
 
-The entry point for using the trace recorder programmatically is the class `ScpTraceRecorder`.
+*More information to come*
 
-To use the class `ScpTraceRecorder`, one must select a **trace source**, i.e. a list of methods for which to generate the traces.  
-To facilitate methods selection, we provide the `ScpTraceSourceSelectionBuilder`.  
-In the following example the selection builder selects all methods of the package where the class `ScpExampleObjectA` is located.  
+Simply create an instance of the recorder.  
+If needed, specify a block which must return true whenever the recorder should ignore the execution details of the method in argument.  
 
-```st
-| traceSource |
-	
-traceSource := ScpTraceSourceSelectionBuilder new
-  matchPackages: (OTMatcher name: 
-	  ScpExampleObjectA package name
-  );
-  build.
-```
-
-Now, one must define a handler which will capture each trace:  
-- **Method calls**: which are received from a method external to the trace source.  
-- **Messages**: that are sent by any method included in the trace source.  
-- **Assignments**: performed inside any method included in the trace source.  
-- **Returns**: from any method included in the trace source.  
-
-The handler must be provided to the `ScpTraceRecorder` through the `ScpTraceRecorder >>#storage:` setter.  
-Note: this setter may be renamed in the future depending on this project evolution.  
-The following example illustrates the `ScpTraceRecorder` set up.  
+Start the recorded execution by using the method `recordBlock: aBlock`:
 
 ```st
-| traceSource traceRecorder |
-	
-traceRecorder := ScpTraceRecorder new.
-traceRecorder source: traceSource.
-traceRecorder storage: ScpTraceListStorage new.
+| recorder |
+
+recorder := ScpExecutionRecorder new 
+	ignore: [ :m | 
+		(m package name beginsWith: #Morph)
+		or: [ m package name beginsWith: #FreeType ]
+	];
+	recordBlock: [ Transcript open ];
+  yourself.
+
+recorder execution inspect. "Inspect the traces. (More to come)"
 ```
 
-Once the `ScpTraceRecorder` is set up, one must run it using following methods:  
-- `ScpTraceRecorder >> #switchOn`: to install the hooks which will generate the traces.  
-- `ScpTraceRecorder >> #startRecording`: to activate the handler, i.e. start catching the execution traces.	 
-- `ScpTraceRecorder >> #switchOff`: to de-activate the handler and remove the hooks.  
+Or attach the newly created recorder to an existing process and resume the latter process:
 
 ```st
-| traceSource traceRecorder |
-	
-traceRecorder switchOn.
-traceRecorder startRecording.
-traceRecorder switchOff
-```
-## Known issues
+| recorder |
 
-Scenarios which can lead to a crashing image:
-- Trying to trace methods from Scopeo's packages.
-- Trying to trace methods that are specific to Pharo execution and that should not be rewritten/recompiled, such as:
-  - Methods from the `ProtoObject`.
-  - Reflective methods of `Object`, i.e. class, slots...
-  - Primitive methods.
+recorder := ScpExecutionRecorder new 
+  attachToProcess: anExistingProcess;
+  yourself.
+
+anExistingProcess resume.
+
+recorder execution inspect. "Inspect the traces. (More to come)"
+
+```
+
+Or attach to the context of a suspended process and resume that process:
+
+```st
+| recorder | 
+
+recorder := ScpExecutionRecorder new 
+  attachToContext: anExistingProcess suspendedContext;
+  yourself
+
+anExistingProcess resume.
+
+recorder execution inspect. "Inspect the traces. (More to come)"
+```
