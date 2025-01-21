@@ -3,54 +3,29 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'execution',
-		'methods',
+		'context',
 		'instrumentation',
-		'process',
-		'context'
+		'ignore',
+		'methods'
 	],
 	#category : 'Scopeo-TraceRecorder',
 	#package : 'Scopeo-TraceRecorder'
 }
 
-{ #category : 'as yet unclassified' }
-ScpExecutionRecorder class >> attachToContext: aContext [
+{ #category : 'recording' }
+ScpExecutionRecorder class >> recordBlock: aBlock [
 
-	^ self new 
-		record: aContext;
+	^ self new
+		recordBlock: aBlock;
 		yourself
 ]
 
-{ #category : 'as yet unclassified' }
-ScpExecutionRecorder class >> attachToProcess: aProcess [
+{ #category : 'recording' }
+ScpExecutionRecorder class >> recordMethod: aBlock [
 
-	^ self attachToContext: aProcess suspendedContext
-]
-
-{ #category : 'as yet unclassified' }
-ScpExecutionRecorder class >> recordBlock: aBlock [
-
-	^ self recordMethod: (RBMethodNode 
-		selector: #DoIt 
-		body: aBlock sourceNode body)
-		generateMethod.
-]
-
-{ #category : 'as yet unclassified' }
-ScpExecutionRecorder class >> recordMethod: aMethod [
-	
-	| process recorder |
-	
-	process := [ nil executeMethod: aMethod ] newProcess.
-	[ 
-		process isTerminated or: [ 
-			process suspendedContext method == aMethod 
-		] 
-	] whileFalse: [ process step ].
-
-	recorder := self attachToProcess: process.	
-	process resume.
-
-	^ recorder
+	^ self new
+		recordMethod: aBlock;
+		yourself
 ]
 
 { #category : 'private' }
@@ -69,6 +44,23 @@ ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue n
 	^ aNewValue
 ]
 
+{ #category : 'services' }
+ScpExecutionRecorder >> attachToContext: aContext [
+
+	context := aContext.
+	context 
+		setSender: context sender 
+		receiver: context receiver 
+		method: (instrumentation applyOn: context method) 
+		arguments: context arguments
+]
+
+{ #category : 'services' }
+ScpExecutionRecorder >> attachToProcess: aProcess [
+
+	self attachToContext: aProcess suspendedContext
+]
+
 { #category : 'accessing' }
 ScpExecutionRecorder >> context [
 
@@ -81,16 +73,24 @@ ScpExecutionRecorder >> execution [
 	^ execution
 ]
 
+{ #category : 'parameters' }
+ScpExecutionRecorder >> ignore: aBlock [
+
+	ignore := aBlock
+]
+
 { #category : 'initialization' }
 ScpExecutionRecorder >> initialize [
 
 	execution := ScpExecution new.
-
 	methods := Dictionary new.
-
+	
+	
+	ignore := [ :m | false ].
+	
 	instrumentation := ScpMethodInstrumentation new.
 	instrumentation addIndirection: (ScpAssignmentIndirection new
-		condition: [ :n | n isInstanceVariable ];
+		condition: [ :n | n variable isInstanceVariable ];
 		handler: self;
 		selector: #assignment:object:old:new:;
 		arguments: #( variable object oldValue newValue );
@@ -121,23 +121,27 @@ ScpExecutionRecorder >> initialize [
 ]
 
 { #category : 'private' }
-ScpExecutionRecorder >> instrument: aMethod [
+ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 
-	aMethod isInstrumented ifTrue: [ ^ aMethod ].
+	| method |
+		
+	method := aClass lookupSelector: aSelector. 
+	method ifNil: [ self error: 'Instance of ', aClass, ' did not understand ', aSelector ].		
+	
+	method isInstrumented ifTrue: [ ^ method ].
+	method isPrimitive ifTrue: [ ^ method ].
+	(method pragmaAt: #noInstrumentation) ifNotNil: [ ^ method ].	
 
-	aMethod methodClass = UndefinedObject ifFalse: [ 
-		(aMethod package name beginsWith: #Scopeo) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #Morphic) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #Collection) ifTrue: [ ^ aMethod ].
+	method methodClass = UndefinedObject ifFalse: [ 
+		(method package name beginsWith: #Kernel) ifTrue: [ ^ method ].
+		(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
+		(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
+		(method package name beginsWith: #Scopeo) ifTrue: [ ^ method ].
+		(ignore value: method) ifTrue: [ ^ method ].
 	].
 	
-	aMethod isPrimitive ifTrue: [ ^ aMethod ].
-	(aMethod pragmaAt: #noInstrumentation) ifNotNil: [ ^ aMethod ].
-
-	^ methods at: aMethod name ifAbsentPut: [ 
-		instrumentation applyOn: aMethod 
+	^ methods at: method name ifAbsentPut: [ 
+		instrumentation applyOn: method 
 	]
 ]
 
@@ -155,23 +159,34 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 	^ aReceiver
 		withArgs: anArguments 
 		executeMethod: (
-			self instrument: (
-				aReceiver class 
-					lookupSelector: aNode selector
-			)
+			self lookup: aNode selector in: aReceiver class for: aReceiver
 		)
 ]
 
-{ #category : 'actions api' }
-ScpExecutionRecorder >> record: aContext [
-	
-	context := aContext.
-	context 
-		setSender: context sender 
-		receiver: context receiver 
-		method: (instrumentation applyOn: context method) 
-		arguments: context arguments
+{ #category : 'services' }
+ScpExecutionRecorder >> recordBlock: aBlock [
 
+	self recordMethod: (RBMethodNode 
+		selector: #DoIt 
+		body: aBlock sourceNode body)
+		generateMethod.
+]
+
+{ #category : 'services' }
+ScpExecutionRecorder >> recordMethod: aMethod [
+	
+	| process |
+	
+	process := [ nil executeMethod: aMethod ] newProcess.
+	[ 
+		process isTerminated or: [ 
+			process suspendedContext method == aMethod 
+		] 
+	] whileFalse: [ process step ].
+
+	self attachToProcess: process.	
+
+	process resume.
 ]
 
 { #category : 'private' }
@@ -188,10 +203,7 @@ ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
 	^ aSender
 		withArgs: anArguments 
 		executeMethod: (
-			self instrument: (
-				aSender class 
-					lookupSelector: aNode selector
-			)
+			self lookup: aNode selector in: aSender class for: aSender
 		)
 ]
 
@@ -209,10 +221,8 @@ ScpExecutionRecorder >> super: aNode sender: aSender arguments: anArguments [
 	^ aSender 
 		withArgs: anArguments 
 		executeMethod: (
-			self instrument: (
-				aNode methodNode compiledMethod 
-					methodClass superclass
-					lookupSelector: aNode selector
-			)
+			self lookup: aNode selector 
+				in: aNode methodNode compiledMethod methodClass superclass 
+				for: aSender
 		)
 ]
