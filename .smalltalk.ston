@@ -1,0 +1,15 @@
+SmalltalkCISpec {
+    #loading : [
+      SCIMetacelloLoadSpec {
+        #baseline : 'ScopeoExecutionRecorder',
+        #directory : 'src',
+        #load : 'default',
+        #onConflict : #useIncoming,
+        #onUpgrade : #useIncoming,
+        #ignoreImage : true
+      }
+    ],
+    #testing : { 
+        #packages: [ 'Scopeo-Execution-Recorder.*' ]
+    }
+  }
