@@ -1,6 +1,6 @@
 Extension { #name : 'FFICalloutAPI' }
 
-{ #category : '*Scopeo-TraceRecorder' }
+{ #category : '*Scopeo-Execution-Recorder' }
 FFICalloutAPI >> senderContext [
 
 	| context |

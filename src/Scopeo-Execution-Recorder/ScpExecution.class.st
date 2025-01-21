@@ -4,8 +4,8 @@ Class {
 	#instVars : [
 		'traces'
 	],
-	#category : 'Scopeo-TraceRecorder',
-	#package : 'Scopeo-TraceRecorder'
+	#category : 'Scopeo-Execution-Recorder',
+	#package : 'Scopeo-Execution-Recorder'
 }
 
 { #category : 'adding' }

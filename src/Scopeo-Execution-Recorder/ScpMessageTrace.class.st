@@ -7,8 +7,8 @@ Class {
 		'receiver',
 		'arguments'
 	],
-	#category : 'Scopeo-TraceRecorder',
-	#package : 'Scopeo-TraceRecorder'
+	#category : 'Scopeo-Execution-Recorder',
+	#package : 'Scopeo-Execution-Recorder'
 }
 
 { #category : 'accessing' }

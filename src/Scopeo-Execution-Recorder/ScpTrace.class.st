@@ -1,8 +1,8 @@
 Class {
 	#name : 'ScpTrace',
 	#superclass : 'Object',
-	#category : 'Scopeo-TraceRecorder',
-	#package : 'Scopeo-TraceRecorder'
+	#category : 'Scopeo-Execution-Recorder',
+	#package : 'Scopeo-Execution-Recorder'
 }
 
 { #category : 'testing' }
