@@ -67,6 +67,27 @@ ScpExecutionRecorder >> context [
 	^ context
 ]
 
+{ #category : 'private' }
+ScpExecutionRecorder >> execute: aSelector in: aClass for: aReceiver with: anArgument [
+	
+	| method arguments |
+
+	arguments := anArgument.
+	method := self lookup: aSelector in: aClass for: aReceiver.
+	method selector = #doesNotUnderstand: ifTrue: [
+		arguments := { 
+			MessageSend 
+				receiver: aReceiver 
+				selector: aSelector 
+				arguments: anArgument
+		 }
+	].
+
+	^ aReceiver 
+			withArgs: arguments
+			executeMethod: method
+]
+
 { #category : 'accessing' }
 ScpExecutionRecorder >> execution [
 
@@ -126,20 +147,24 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 	| method |
 		
 	method := aClass lookupSelector: aSelector. 
-	method ifNil: [ self error: 'Instance of ', aClass, ' did not understand ', aSelector ].		
-	
-	method isInstrumented ifTrue: [ ^ method ].
-	method isPrimitive ifTrue: [ ^ method ].
-	(method pragmaAt: #noInstrumentation) ifNotNil: [ ^ method ].	
+	method 
+		ifNil: [ 
+			method := aClass lookupSelector: #doesNotUnderstand:.	
+		] 
+		ifNotNil: [ 
+			method isInstrumented ifTrue: [ ^ method ].
+			method isPrimitive ifTrue: [ ^ method ].
+			(method pragmaAt: #noInstrumentation) ifNotNil: [ ^ method ].	
 
-	method methodClass = UndefinedObject ifFalse: [ 
-		(method package name beginsWith: #Kernel) ifTrue: [ ^ method ].
-		(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
-		(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
-		(method package name beginsWith: #Scopeo) ifTrue: [ ^ method ].
-		(ignore value: method) ifTrue: [ ^ method ].
-	].
-	
+			method methodClass = UndefinedObject ifFalse: [ 
+				(method package name beginsWith: #Kernel) ifTrue: [ ^ method ].
+				(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
+				(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
+				(method package name beginsWith: #Scopeo) ifTrue: [ ^ method ].
+				(ignore value: method) ifTrue: [ ^ method ].
+			].
+		].
+
 	^ methods at: method name ifAbsentPut: [ 
 		instrumentation applyOn: method 
 	]
@@ -156,11 +181,11 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 		yourself
 	).	
 
-	^ aReceiver
-		withArgs: anArguments 
-		executeMethod: (
-			self lookup: aNode selector in: aReceiver class for: aReceiver
-		)
+	^ self 
+		execute: aNode selector 
+		in: aReceiver class 
+		for: aReceiver 
+		with: anArguments
 ]
 
 { #category : 'services' }
@@ -199,12 +224,12 @@ ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
 		arguments: anArguments;
 		yourself
 	).	
-			
-	^ aSender
-		withArgs: anArguments 
-		executeMethod: (
-			self lookup: aNode selector in: aSender class for: aSender
-		)
+
+	^ self 
+		execute: aNode selector 
+		in: aSender class 
+		for: aSender 
+		with: anArguments
 ]
 
 { #category : 'private' }
@@ -218,11 +243,9 @@ ScpExecutionRecorder >> super: aNode sender: aSender arguments: anArguments [
 		yourself
 	).
 
-	^ aSender 
-		withArgs: anArguments 
-		executeMethod: (
-			self lookup: aNode selector 
-				in: aNode methodNode compiledMethod methodClass superclass 
-				for: aSender
-		)
+	^ self 
+		execute: aNode selector 
+		in: aNode methodNode compiledMethod methodClass superclass
+		for: aSender 
+		with: anArguments
 ]
