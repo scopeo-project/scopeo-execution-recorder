@@ -3,30 +3,15 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'execution',
-		'context',
 		'instrumentation',
 		'ignore',
-		'methods'
+		'methods',
+		'process',
+		'semaphore'
 	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
-
-{ #category : 'recording' }
-ScpExecutionRecorder class >> recordBlock: aBlock [
-
-	^ self new
-		recordBlock: aBlock;
-		yourself
-]
-
-{ #category : 'recording' }
-ScpExecutionRecorder class >> recordMethod: aBlock [
-
-	^ self new
-		recordMethod: aBlock;
-		yourself
-]
 
 { #category : 'private' }
 ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue new: aNewValue [
@@ -42,29 +27,6 @@ ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue n
 	aVariable write: aNewValue to: anObject.
 
 	^ aNewValue
-]
-
-{ #category : 'services' }
-ScpExecutionRecorder >> attachToContext: aContext [
-
-	context := aContext.
-	context 
-		setSender: context sender 
-		receiver: context receiver 
-		method: (instrumentation applyOn: context method) 
-		arguments: context arguments
-]
-
-{ #category : 'services' }
-ScpExecutionRecorder >> attachToProcess: aProcess [
-
-	self attachToContext: aProcess suspendedContext
-]
-
-{ #category : 'accessing' }
-ScpExecutionRecorder >> context [
-
-	^ context
 ]
 
 { #category : 'private' }
@@ -94,6 +56,54 @@ ScpExecutionRecorder >> execution [
 	^ execution
 ]
 
+{ #category : 'services' }
+ScpExecutionRecorder >> forBlock: aBlock [
+
+	self forMethod: (RBMethodNode 
+		selector: #DoIt 
+		body: aBlock sourceNode body)
+		generateMethod.
+]
+
+{ #category : 'services' }
+ScpExecutionRecorder >> forMethod: aMethod [
+	
+	| context proc |
+	
+	context := [ nil executeMethod: aMethod ] asContext.
+	semaphore := Semaphore new.
+	context privSender: [ 
+		semaphore signal.
+		Processor terminateRealActive
+	] asContext.
+
+	proc := Process 
+		forContext: context 
+		priority: Processor userInterruptPriority.
+	
+	[ 
+		proc isTerminated or: [ 
+			proc suspendedContext method == aMethod 
+		] 
+	] whileFalse: [ proc step ].
+
+	self forProcess: proc
+]
+
+{ #category : 'services' }
+ScpExecutionRecorder >> forProcess: aProcess [
+	
+	| context |
+	
+	process := aProcess.
+	context := process suspendedContext.
+	context
+		setSender: context sender 
+		receiver: context receiver 
+		method: (instrumentation applyOn: context method) 
+		arguments: context arguments
+]
+
 { #category : 'parameters' }
 ScpExecutionRecorder >> ignore: aBlock [
 
@@ -105,8 +115,7 @@ ScpExecutionRecorder >> initialize [
 
 	execution := ScpExecution new.
 	methods := Dictionary new.
-	
-	
+		
 	ignore := [ :m | false ].
 	
 	instrumentation := ScpMethodInstrumentation new.
@@ -188,30 +197,28 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 		with: anArguments
 ]
 
-{ #category : 'services' }
-ScpExecutionRecorder >> recordBlock: aBlock [
+{ #category : 'accessing' }
+ScpExecutionRecorder >> process [
 
-	self recordMethod: (RBMethodNode 
-		selector: #DoIt 
-		body: aBlock sourceNode body)
-		generateMethod.
+	^ process
 ]
 
 { #category : 'services' }
-ScpExecutionRecorder >> recordMethod: aMethod [
-	
-	| process |
-	
-	process := [ nil executeMethod: aMethod ] newProcess.
-	[ 
-		process isTerminated or: [ 
-			process suspendedContext method == aMethod 
-		] 
-	] whileFalse: [ process step ].
+ScpExecutionRecorder >> run [
 
-	self attachToProcess: process.	
+	semaphore 
+		ifNil: [ self runAsynchronously ]
+		ifNotNil: [ 
+			process resume.
+			semaphore wait
+		]
+	
+]
 
-	process resume.
+{ #category : 'services' }
+ScpExecutionRecorder >> runAsynchronously [
+
+	process resume
 ]
 
 { #category : 'private' }
