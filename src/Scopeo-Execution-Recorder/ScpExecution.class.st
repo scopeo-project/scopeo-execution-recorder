@@ -19,3 +19,9 @@ ScpExecution >> initialize [
 
 	traces := OrderedCollection new
 ]
+
+{ #category : 'accessing' }
+ScpExecution >> traces [
+
+	^ traces
+]

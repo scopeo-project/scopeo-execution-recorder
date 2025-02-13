@@ -11,6 +11,14 @@ Class {
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'testing' }
+ScpAssignmentTrace >> isAssignment [
+
+	^ true
+
+	
+]
+
 { #category : 'accessing' }
 ScpAssignmentTrace >> newValue [
 

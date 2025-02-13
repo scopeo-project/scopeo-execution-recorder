@@ -24,6 +24,12 @@ ScpMessageTrace >> arguments: anObject [
 ]
 
 { #category : 'testing' }
+ScpMessageTrace >> isMessage [
+
+	^ true
+]
+
+{ #category : 'testing' }
 ScpMessageTrace >> isMessageToSelf [
 
 	^ false

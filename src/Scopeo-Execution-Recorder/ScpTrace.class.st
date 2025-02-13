@@ -11,13 +11,14 @@ ScpTrace class >> isAbstract [
 	^ self == ScpTrace
 ]
 
-{ #category : 'accessing' }
-ScpTrace >> yourself [
+{ #category : 'testing' }
+ScpTrace >> isAssignment [
 
-	"Smalltalk logStdOutDuring: [:logger |
-		logger nextPutAll: self asString.
-		logger nextPutAll: String crlf
-	]."
+	^ false
+]
 
-	^ self
+{ #category : 'testing' }
+ScpTrace >> isMessage [
+
+	^ false
 ]

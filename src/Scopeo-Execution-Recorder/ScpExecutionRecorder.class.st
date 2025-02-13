@@ -1,3 +1,6 @@
+"
+![TEst](```st self iceRepository```)
+"
 Class {
 	#name : 'ScpExecutionRecorder',
 	#superclass : 'Object',
@@ -59,49 +62,86 @@ ScpExecutionRecorder >> execution [
 { #category : 'services' }
 ScpExecutionRecorder >> forBlock: aBlock [
 
-	self forMethod: (RBMethodNode 
-		selector: #DoIt 
-		body: aBlock sourceNode body)
-		generateMethod.
+"	aBlock isClean ifFalse: [ 
+		self error: 'Can record clean blocks only'
+	].
+"
+	self 
+		forCode: aBlock sourceNode body formattedCode 
+		inContext: aBlock outerContext
+		onReceiver: aBlock outerContext receiver
+]
+
+{ #category : 'services' }
+ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver [
+
+	| method methodClass |
+
+	methodClass := aContext 
+		ifNil: [ aReceiver class ] 
+		ifNotNil: [ aContext methodClass ]. 	
+
+	method := instrumentation applyOn: (methodClass compiler
+		source: aCode;
+		class: methodClass;
+		context: aContext;
+		isScripting: true;
+		compile
+	).
+	
+	self forMethod: method inContext: aContext onReceiver: aReceiver
+]
+
+{ #category : 'services' }
+ScpExecutionRecorder >> forContext: aContext [
+
+	self 
+		forMethod: aContext method 
+		inContext: aContext 
+		onReceiver: aContext receiver
 ]
 
 { #category : 'services' }
 ScpExecutionRecorder >> forMethod: aMethod [
-	
-	| context proc |
-	
-	context := [ nil executeMethod: aMethod ] asContext.
-	semaphore := Semaphore new.
-	context privSender: [ 
-		semaphore signal.
-		Processor terminateRealActive
-	] asContext.
 
-	proc := Process 
-		forContext: context 
-		priority: Processor userInterruptPriority.
-	
-	[ 
-		proc isTerminated or: [ 
-			proc suspendedContext method == aMethod 
-		] 
-	] whileFalse: [ proc step ].
-
-	self forProcess: proc
+	self forMethod: aMethod inContext: nil onReceiver: nil 
 ]
 
 { #category : 'services' }
-ScpExecutionRecorder >> forProcess: aProcess [
+ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aReceiver [
+
+	| arguments |
 	
-	| context |
+	arguments := #().
 	
-	process := aProcess.
-	context := process suspendedContext.
-	context
-		setSender: context sender 
-		receiver: context receiver 
-		method: (instrumentation applyOn: context method) 
-		arguments: context arguments
+	aMethod numArgs > 0 ifTrue: [ 
+		aContext ifNil: [ 
+			self error: 'The method expects arguments, please provide a context from which to extract them.' 
+		].
+		arguments := aContext arguments
+	].
+
+	semaphore := Semaphore new.
+	process := [ 
+		[
+			aMethod
+				valueWithReceiver: aReceiver
+			 	arguments: arguments.
+			semaphore signal.
+		] on: Exception do: [ :ex | 
+			semaphore signal.
+			ex pass.
+		]
+	] newProcess.
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecorder >> handleError: anError [
+
+	process terminate.
+	semaphore signal.
+
+	anError crTrace.
 ]
 
 { #category : 'parameters' }
@@ -206,13 +246,8 @@ ScpExecutionRecorder >> process [
 { #category : 'services' }
 ScpExecutionRecorder >> run [
 
-	semaphore 
-		ifNil: [ self runAsynchronously ]
-		ifNotNil: [ 
-			process resume.
-			semaphore wait
-		]
-	
+	process resume.
+	semaphore wait.
 ]
 
 { #category : 'services' }
