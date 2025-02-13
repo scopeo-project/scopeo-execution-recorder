@@ -62,10 +62,10 @@ ScpExecutionRecorder >> execution [
 { #category : 'services' }
 ScpExecutionRecorder >> forBlock: aBlock [
 
-"	aBlock isClean ifFalse: [ 
-		self error: 'Can record clean blocks only'
+	aBlock isClean ifFalse: [ 
+		self error: 'Please use clean blocks only.'
 	].
-"
+
 	self 
 		forCode: aBlock sourceNode body formattedCode 
 		inContext: aBlock outerContext
@@ -133,15 +133,6 @@ ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aRece
 			ex pass.
 		]
 	] newProcess.
-]
-
-{ #category : 'accessing' }
-ScpExecutionRecorder >> handleError: anError [
-
-	process terminate.
-	semaphore signal.
-
-	anError crTrace.
 ]
 
 { #category : 'parameters' }
