@@ -59,7 +59,7 @@ ScpExecutionRecorder >> execution [
 	^ execution
 ]
 
-{ #category : 'services' }
+{ #category : 'parameters' }
 ScpExecutionRecorder >> forBlock: aBlock [
 
 	aBlock isClean ifFalse: [ 
@@ -72,7 +72,7 @@ ScpExecutionRecorder >> forBlock: aBlock [
 		onReceiver: aBlock outerContext receiver
 ]
 
-{ #category : 'services' }
+{ #category : 'private' }
 ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver [
 
 	| method methodClass |
@@ -88,11 +88,11 @@ ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver
 		isScripting: true;
 		compile
 	).
-	
+
 	self forMethod: method inContext: aContext onReceiver: aReceiver
 ]
 
-{ #category : 'services' }
+{ #category : 'parameters' }
 ScpExecutionRecorder >> forContext: aContext [
 
 	self 
@@ -101,13 +101,13 @@ ScpExecutionRecorder >> forContext: aContext [
 		onReceiver: aContext receiver
 ]
 
-{ #category : 'services' }
+{ #category : 'parameters' }
 ScpExecutionRecorder >> forMethod: aMethod [
 
 	self forMethod: aMethod inContext: nil onReceiver: nil 
 ]
 
-{ #category : 'services' }
+{ #category : 'private' }
 ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aReceiver [
 
 	| arguments |
