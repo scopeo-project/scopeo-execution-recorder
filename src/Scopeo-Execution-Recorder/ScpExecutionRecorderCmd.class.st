@@ -26,39 +26,19 @@ ScpExecutionRecorderCmd class >> defaultShortcutKey [
 { #category : 'executing' }
 ScpExecutionRecorderCmd >> execute [
 
-	| code doItReceiver doItContext methodClass method process semaphore |
-	self halt.
-	code := self selectedTextOrLine.
+	| doItReceiver doItContext |
+
 	(self context respondsTo: #doItReceiver)
 		ifTrue: [
 			doItReceiver := self context doItReceiver.
 			doItContext := self context doItContext ]
 		ifFalse: [ doItReceiver := doItContext := nil ].
 
-	methodClass := doItContext
-		ifNil: [ doItReceiver class ]
-		ifNotNil: [ doItContext methodClass ].
+	(ScpExecutionRecorder new
+		forCode: self selectedTextOrLine 
+		inContext: doItContext 
+		onReceiver: doItReceiver;
+		run;
+		execution) inspect
 
-	method := context class compiler
-		          source: code;
-		          class: methodClass;
-		          context: doItContext;
-		          requestor: context;
-		          isScripting: true;
-		          compile.
-
-	semaphore := Semaphore new.
-	process := [
-		[ 
-			method
-				valueWithReceiver: doItReceiver
-		  		arguments: (method numArgs = 0
-				  	ifTrue: [ #(  ) ]
-				   ifFalse: [ { doItContext } ]
-				)
-		] ensure: [ semaphore signalAll ]
-	] newProcess.
-
-	process resume.
-	semaphore wait
 ]
