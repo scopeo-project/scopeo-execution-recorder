@@ -19,6 +19,8 @@ Class {
 { #category : 'private' }
 ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue new: aNewValue [
 
+	<debuggerCompleteToSender>
+
 	execution add: (ScpAssignmentTrace new
 		variable: aVariable;
 		object: anObject;
@@ -33,7 +35,38 @@ ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue n
 ]
 
 { #category : 'private' }
+ScpExecutionRecorder >> execute: aMethod for: aReceiver with: anArguments [
+
+	<debuggerCompleteToSender>
+
+	| method result |
+
+	method := aMethod.
+	[  
+		method isCompiledMethod ifTrue: [ 
+			method := instrumentation applyOn: method.
+		].
+
+		result := method 
+			valueWithReceiver: aReceiver 
+			arguments: anArguments.
+			
+		semaphore signal.
+	]
+	on: Exception do: [ :e | 
+		"Unlock waiting processes in case an exception is not caught earlier."
+		semaphore signal.
+		e pass.
+	].
+	
+	^ result
+
+]
+
+{ #category : 'private' }
 ScpExecutionRecorder >> execute: aSelector in: aClass for: aReceiver with: anArgument [
+	
+	<debuggerCompleteToSender>
 	
 	| method arguments |
 
@@ -81,13 +114,12 @@ ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver
 		ifNil: [ aReceiver class ] 
 		ifNotNil: [ aContext methodClass ]. 	
 
-	method := instrumentation applyOn: (methodClass compiler
+	method := methodClass compiler
 		source: aCode;
 		class: methodClass;
 		context: aContext;
 		isScripting: true;
-		compile
-	).
+		compile.
 
 	self forMethod: method inContext: aContext onReceiver: aReceiver
 ]
@@ -95,44 +127,45 @@ ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver
 { #category : 'parameters' }
 ScpExecutionRecorder >> forContext: aContext [
 
-	self 
-		forMethod: aContext method 
-		inContext: aContext 
-		onReceiver: aContext receiver
-]
-
-{ #category : 'parameters' }
-ScpExecutionRecorder >> forMethod: aMethod [
-
-	self forMethod: aMethod inContext: nil onReceiver: nil 
+	semaphore := Semaphore new.
+	aContext 
+		setSender: aContext sender 
+		receiver: self
+		method: (self class >> #execute:for:with:)
+		arguments: { aContext method . aContext receiver . aContext arguments }
 ]
 
 { #category : 'private' }
 ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aReceiver [
-
+	
 	| arguments |
-	
+
 	arguments := #().
-	
 	aMethod numArgs > 0 ifTrue: [ 
 		aContext ifNil: [ 
 			self error: 'The method expects arguments, please provide a context from which to extract them.' 
 		].
 		arguments := aContext arguments
 	].
-
-	semaphore := Semaphore new.
+	
 	process := [ 
-		[
-			aMethod
-				valueWithReceiver: aReceiver
-			 	arguments: arguments.
-			semaphore signal.
-		] on: Exception do: [ :ex | 
-			semaphore signal.
-			ex pass.
-		]
+		aMethod 
+			valueWithReceiver: aReceiver
+			arguments: arguments.	
 	] newProcess.
+	
+	[ process suspendedContext method == aMethod ] whileFalse: [ 
+		process step 
+	].
+
+	self forProcess: process
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder >> forProcess: aProcess [
+
+	self forContext: aProcess suspendedContext.
+	process := aProcess
 ]
 
 { #category : 'parameters' }
@@ -213,6 +246,8 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 { #category : 'private' }
 ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver arguments: anArguments [
 
+	<debuggerCompleteToSender>
+
 	execution add: (ScpMessageTrace new
 		selector: aNode selector;
 		sender: aSender;
@@ -250,6 +285,8 @@ ScpExecutionRecorder >> runAsynchronously [
 { #category : 'private' }
 ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
 
+	<debuggerCompleteToSender>
+
 	execution add: (ScpMessageToSelfTrace new
 		selector: aNode selector;
 		sender: aSender;
@@ -267,6 +304,8 @@ ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
 
 { #category : 'private' }
 ScpExecutionRecorder >> super: aNode sender: aSender arguments: anArguments [
+
+	<debuggerCompleteToSender>
 
 	execution add: (ScpMessageToSuperTrace new
 		selector: aNode selector;
