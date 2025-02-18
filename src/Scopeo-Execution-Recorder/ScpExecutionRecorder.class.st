@@ -12,9 +12,39 @@ Class {
 		'process',
 		'semaphore'
 	],
+	#classInstVars : [
+		'recorders'
+	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
+
+{ #category : 'parameters' }
+ScpExecutionRecorder class >> forBlock: aBlock [
+
+	^ self new
+		forBlock: aBlock;
+		yourself
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder class >> forProcess: aProcess [
+
+	^ self recorders at: aProcess ifAbsentPut: [ 
+		self new
+			forProcess: aProcess;
+			yourself
+	]
+	
+	
+	
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecorder class >> recorders [
+
+	^ recorders ifNil: [ recorders := WeakKeyDictionary new ]
+]
 
 { #category : 'private' }
 ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue new: aNewValue [
@@ -164,8 +194,9 @@ ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aRece
 { #category : 'parameters' }
 ScpExecutionRecorder >> forProcess: aProcess [
 
-	self forContext: aProcess suspendedContext.
-	process := aProcess
+	process := ScpProcessInstrumentation forProcess: aProcess.
+	process isSuspended ifFalse: [ process suspend ].
+	process instrumentation: instrumentation
 ]
 
 { #category : 'parameters' }
