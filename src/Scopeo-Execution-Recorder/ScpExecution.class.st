@@ -11,7 +11,11 @@ Class {
 { #category : 'adding' }
 ScpExecution >> add: aTrace [
 
-	traces add: aTrace
+	traces ifNotEmpty: [ 
+		aTrace previous: traces last
+	].
+
+	traces add: aTrace.
 ]
 
 { #category : 'initialization' }

@@ -1,6 +1,10 @@
 Class {
 	#name : 'ScpTrace',
 	#superclass : 'Object',
+	#instVars : [
+		'previous',
+		'next'
+	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
@@ -21,4 +25,29 @@ ScpTrace >> isAssignment [
 ScpTrace >> isMessage [
 
 	^ false
+]
+
+{ #category : 'accessing' }
+ScpTrace >> next [
+
+	^ next
+]
+
+{ #category : 'accessing' }
+ScpTrace >> next: aNext [
+
+	next := aNext
+]
+
+{ #category : 'accessing' }
+ScpTrace >> previous [
+
+	^ previous
+]
+
+{ #category : 'accessing' }
+ScpTrace >> previous: aTask [
+
+	aTask next: self.
+	previous := aTask.
 ]
