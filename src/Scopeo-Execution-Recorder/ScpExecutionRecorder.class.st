@@ -12,9 +12,74 @@ Class {
 		'process',
 		'semaphore'
 	],
+	#classInstVars : [
+		'recorders'
+	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
+
+{ #category : 'parameters' }
+ScpExecutionRecorder class >> forBlock: aBlock [
+
+	aBlock isClean ifFalse: [
+		self error: 'Please use clean blocks only.' 
+	].
+	
+	^ self
+		forCode: aBlock sourceNode body formattedCode
+		inContext: aBlock outerContext
+		onReceiver: aBlock outerContext receiver
+]
+
+{ #category : 'private' }
+ScpExecutionRecorder class >> forCode: aCode inContext: aContext onReceiver: aReceiver [
+
+	| method methodClass arguments process |
+
+	methodClass := aContext
+		ifNil: [ aReceiver class ]
+		ifNotNil: [ aContext methodClass ].
+
+	method := methodClass compiler
+		source: aCode;
+		class: methodClass;
+		context: aContext;
+		isScripting: true;
+		compile.
+
+	arguments := #(  ).
+	method numArgs > 0 ifTrue: [
+		aContext ifNil: [
+			self error:'The method expects arguments, please provide a context from which to extract them.'
+		].
+		arguments := aContext arguments 
+	].
+
+	process := [ 
+		method valueWithReceiver: aReceiver arguments: arguments 
+	] newProcess.
+
+	[ process suspendedContext method == method ] whileFalse: [ process step ].
+	
+	^ self forProcess: process
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder class >> forProcess: aProcess [
+
+	^ self recorders at: aProcess ifAbsentPut: [ 
+		self new
+			process: aProcess;
+			yourself
+	]
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder class >> recorders [
+
+	^ recorders ifNil: [ recorders := WeakIdentityKeyDictionary new ]
+]
 
 { #category : 'private' }
 ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue new: aNewValue [
@@ -39,15 +104,9 @@ ScpExecutionRecorder >> execute: aMethod for: aReceiver with: anArguments [
 
 	<debuggerCompleteToSender>
 
-	| method result |
-
-	method := aMethod.
+	| result |
 	[  
-		method isCompiledMethod ifTrue: [ 
-			method := instrumentation applyOn: method.
-		].
-
-		result := method 
+		result := aMethod 
 			valueWithReceiver: aReceiver 
 			arguments: anArguments.
 			
@@ -90,82 +149,6 @@ ScpExecutionRecorder >> execute: aSelector in: aClass for: aReceiver with: anArg
 ScpExecutionRecorder >> execution [
 
 	^ execution
-]
-
-{ #category : 'parameters' }
-ScpExecutionRecorder >> forBlock: aBlock [
-
-	aBlock isClean ifFalse: [ 
-		self error: 'Please use clean blocks only.'
-	].
-
-	self 
-		forCode: aBlock sourceNode body formattedCode 
-		inContext: aBlock outerContext
-		onReceiver: aBlock outerContext receiver
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver [
-
-	| method methodClass |
-
-	methodClass := aContext 
-		ifNil: [ aReceiver class ] 
-		ifNotNil: [ aContext methodClass ]. 	
-
-	method := methodClass compiler
-		source: aCode;
-		class: methodClass;
-		context: aContext;
-		isScripting: true;
-		compile.
-
-	self forMethod: method inContext: aContext onReceiver: aReceiver
-]
-
-{ #category : 'parameters' }
-ScpExecutionRecorder >> forContext: aContext [
-
-	semaphore := Semaphore new.
-	aContext 
-		setSender: aContext sender 
-		receiver: self
-		method: (self class >> #execute:for:with:)
-		arguments: { aContext method . aContext receiver . aContext arguments }
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aReceiver [
-	
-	| arguments |
-
-	arguments := #().
-	aMethod numArgs > 0 ifTrue: [ 
-		aContext ifNil: [ 
-			self error: 'The method expects arguments, please provide a context from which to extract them.' 
-		].
-		arguments := aContext arguments
-	].
-	
-	process := [ 
-		aMethod 
-			valueWithReceiver: aReceiver
-			arguments: arguments.	
-	] newProcess.
-	
-	[ process suspendedContext method == aMethod ] whileFalse: [ 
-		process step 
-	].
-
-	self forProcess: process
-]
-
-{ #category : 'parameters' }
-ScpExecutionRecorder >> forProcess: aProcess [
-
-	self forContext: aProcess suspendedContext.
-	process := aProcess
 ]
 
 { #category : 'parameters' }
@@ -231,6 +214,7 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 
 			method methodClass = UndefinedObject ifFalse: [ 
 				(method package name beginsWith: #Kernel) ifTrue: [ ^ method ].
+				(method package name beginsWith: #FreeType) ifTrue: [ ^ method ].
 				(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
 				(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
 				(method package name beginsWith: #Scopeo) ifTrue: [ ^ method ].
@@ -269,6 +253,31 @@ ScpExecutionRecorder >> process [
 	^ process
 ]
 
+{ #category : 'accessing' }
+ScpExecutionRecorder >> process: anObject [
+
+	| context inst |
+
+	process := anObject.
+	context := process suspendedContext.
+	
+
+	inst := instrumentation copy
+		addIndirection: (ScpMethodIndirection new
+			handler: self;
+			selector: #execute:for:with:;
+			arguments: #(method receiver arguments);
+			yourself
+		);
+		yourself.
+	
+	context
+		setSender: context sender 
+		receiver: context receiver 
+		method: (inst applyOn: context method)
+		arguments: context arguments 
+]
+
 { #category : 'services' }
 ScpExecutionRecorder >> run [
 
@@ -300,6 +309,18 @@ ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
 		in: aSender class 
 		for: aSender 
 		with: anArguments
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecorder >> semaphore [
+
+	^ semaphore
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecorder >> semaphore: anObject [
+
+	semaphore := anObject
 ]
 
 { #category : 'private' }
