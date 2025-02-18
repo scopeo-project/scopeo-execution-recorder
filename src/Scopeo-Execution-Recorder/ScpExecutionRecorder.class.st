@@ -22,9 +22,65 @@ Class {
 { #category : 'parameters' }
 ScpExecutionRecorder class >> forBlock: aBlock [
 
-	^ self new
-		forBlock: aBlock;
-		yourself
+	aBlock isClean ifFalse: [ 
+		self error: 'Please use clean blocks only.'
+	].
+
+	^ self 
+		forCode: aBlock sourceNode body formattedCode 
+		inContext: aBlock outerContext
+		onReceiver: aBlock outerContext receiver
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder class >> forCode: aCode inContext: aContext onReceiver: aReceiver [
+
+	| method methodClass arguments process |
+
+	methodClass := aContext 
+		ifNil: [ aReceiver class ] 
+		ifNotNil: [ aContext methodClass ]. 	
+
+	method := methodClass compiler
+		source: aCode;
+		class: methodClass;
+		context: aContext;
+		isScripting: true;
+		compile.
+		
+	arguments := #().
+	method numArgs > 0 ifTrue: [ 
+		aContext ifNil: [ 
+			self error: 'The method expects arguments, please provide a context from which to extract them.' 
+		].
+		arguments := aContext arguments
+	].
+	
+	process := [ 
+		method 
+			valueWithReceiver: aReceiver
+			arguments: arguments.	
+	] newProcess.
+	
+	[ process suspendedContext method == method ] whileFalse: [ 
+		process step 
+	].
+
+	^ self forProcess: process
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorder class >> forDebugSession: aDebugSession [
+
+	| recorder |
+
+	recorder := self forProcess: aDebugSession interruptedProcess.
+	recorder context: aDebugSession interruptedContext.
+	aDebugSession 
+		process: recorder process 
+		context: aDebugSession interruptedContext.
+
+	^ recorder 
 ]
 
 { #category : 'parameters' }
@@ -32,7 +88,7 @@ ScpExecutionRecorder class >> forProcess: aProcess [
 
 	^ self recorders at: aProcess ifAbsentPut: [ 
 		self new
-			forProcess: aProcess;
+			process: aProcess;
 			yourself
 	]
 	
@@ -62,6 +118,12 @@ ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue n
 	aVariable write: aNewValue to: anObject.
 
 	^ aNewValue
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder >> context: aContext [
+
+	process context: aContext
 ]
 
 { #category : 'private' }
@@ -123,83 +185,6 @@ ScpExecutionRecorder >> execution [
 ]
 
 { #category : 'parameters' }
-ScpExecutionRecorder >> forBlock: aBlock [
-
-	aBlock isClean ifFalse: [ 
-		self error: 'Please use clean blocks only.'
-	].
-
-	self 
-		forCode: aBlock sourceNode body formattedCode 
-		inContext: aBlock outerContext
-		onReceiver: aBlock outerContext receiver
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> forCode: aCode inContext: aContext onReceiver: aReceiver [
-
-	| method methodClass |
-
-	methodClass := aContext 
-		ifNil: [ aReceiver class ] 
-		ifNotNil: [ aContext methodClass ]. 	
-
-	method := methodClass compiler
-		source: aCode;
-		class: methodClass;
-		context: aContext;
-		isScripting: true;
-		compile.
-
-	self forMethod: method inContext: aContext onReceiver: aReceiver
-]
-
-{ #category : 'parameters' }
-ScpExecutionRecorder >> forContext: aContext [
-
-	semaphore := Semaphore new.
-	aContext 
-		setSender: aContext sender 
-		receiver: self
-		method: (self class >> #execute:for:with:)
-		arguments: { aContext method . aContext receiver . aContext arguments }
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> forMethod: aMethod inContext: aContext onReceiver: aReceiver [
-	
-	| arguments |
-
-	arguments := #().
-	aMethod numArgs > 0 ifTrue: [ 
-		aContext ifNil: [ 
-			self error: 'The method expects arguments, please provide a context from which to extract them.' 
-		].
-		arguments := aContext arguments
-	].
-	
-	process := [ 
-		aMethod 
-			valueWithReceiver: aReceiver
-			arguments: arguments.	
-	] newProcess.
-	
-	[ process suspendedContext method == aMethod ] whileFalse: [ 
-		process step 
-	].
-
-	self forProcess: process
-]
-
-{ #category : 'parameters' }
-ScpExecutionRecorder >> forProcess: aProcess [
-
-	process := ScpProcessInstrumentation forProcess: aProcess.
-	process isSuspended ifFalse: [ process suspend ].
-	process instrumentation: instrumentation
-]
-
-{ #category : 'parameters' }
 ScpExecutionRecorder >> ignore: aBlock [
 
 	ignore := aBlock
@@ -245,6 +230,24 @@ ScpExecutionRecorder >> initialize [
 
 ]
 
+{ #category : 'testing' }
+ScpExecutionRecorder >> isIgnored: aMethod [
+
+	aMethod isInstrumented ifTrue: [ ^ true ].
+	aMethod isPrimitive ifTrue: [ ^ true ].
+	(aMethod pragmaAt: #noInstrumentation) ifNotNil: [ ^ true ].	
+
+	aMethod methodClass = UndefinedObject ifFalse: [ 
+		(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ true ].
+		(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ true ].
+		(aMethod package name beginsWith: #Collection) ifTrue: [ ^ true ].
+		(aMethod package name beginsWith: #Scopeo) ifTrue: [ ^ true ].
+		(ignore value: aMethod) ifTrue: [ ^ true ].
+	].
+
+	^ false
+]
+
 { #category : 'private' }
 ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 
@@ -256,17 +259,7 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 			method := aClass lookupSelector: #doesNotUnderstand:.	
 		] 
 		ifNotNil: [ 
-			method isInstrumented ifTrue: [ ^ method ].
-			method isPrimitive ifTrue: [ ^ method ].
-			(method pragmaAt: #noInstrumentation) ifNotNil: [ ^ method ].	
-
-			method methodClass = UndefinedObject ifFalse: [ 
-				(method package name beginsWith: #Kernel) ifTrue: [ ^ method ].
-				(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
-				(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
-				(method package name beginsWith: #Scopeo) ifTrue: [ ^ method ].
-				(ignore value: method) ifTrue: [ ^ method ].
-			].
+			(self isIgnored: method) ifTrue: [ ^ method ].
 		].
 
 	^ methods at: method name ifAbsentPut: [ 
@@ -298,6 +291,14 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 ScpExecutionRecorder >> process [
 
 	^ process
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder >> process: aProcess [
+
+	process := ScpInstrumentedProcess from: aProcess.
+	process isSuspended ifFalse: [ process suspend ].
+	process instrumentation: instrumentation
 ]
 
 { #category : 'services' }
