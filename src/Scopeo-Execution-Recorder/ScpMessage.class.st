@@ -1,48 +1,49 @@
 Class {
-	#name : 'ScpMessageTrace',
-	#superclass : 'ScpTrace',
+	#name : 'ScpMessage',
+	#superclass : 'ScpInstruction',
 	#instVars : [
 		'selector',
 		'sender',
 		'receiver',
-		'arguments'
+		'arguments',
+		'result'
 	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
 
 { #category : 'accessing' }
-ScpMessageTrace >> arguments [
+ScpMessage >> arguments [
 
 	^ arguments
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> arguments: anObject [
+ScpMessage >> arguments: anObject [
 
 	arguments := anObject
 ]
 
 { #category : 'testing' }
-ScpMessageTrace >> isMessage [
+ScpMessage >> isMessage [
 
 	^ true
 ]
 
 { #category : 'testing' }
-ScpMessageTrace >> isMessageToSelf [
+ScpMessage >> isMessageToSelf [
 
 	^ false
 ]
 
 { #category : 'testing' }
-ScpMessageTrace >> isMessageToSuper [
+ScpMessage >> isMessageToSuper [
 
 	^ false
 ]
 
 { #category : 'printing' }
-ScpMessageTrace >> printOn: aStream [
+ScpMessage >> printOn: aStream [
 
 	aStream 
 		<< 'Message: '
@@ -53,37 +54,49 @@ ScpMessageTrace >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> receiver [
+ScpMessage >> receiver [
 
 	^ receiver
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> receiver: anObject [
+ScpMessage >> receiver: anObject [
 
 	receiver := anObject
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> selector [
+ScpMessage >> result [
+
+	^ result
+]
+
+{ #category : 'accessing' }
+ScpMessage >> result: anObject [
+
+	result := anObject
+]
+
+{ #category : 'accessing' }
+ScpMessage >> selector [
 
 	^ selector
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> selector: anObject [
+ScpMessage >> selector: anObject [
 
 	selector := anObject
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> sender [
+ScpMessage >> sender [
 
 	^ sender
 ]
 
 { #category : 'accessing' }
-ScpMessageTrace >> sender: anObject [
+ScpMessage >> sender: anObject [
 
 	sender := anObject
 ]

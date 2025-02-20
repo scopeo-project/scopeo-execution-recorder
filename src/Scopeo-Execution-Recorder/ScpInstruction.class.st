@@ -1,12 +1,12 @@
 Class {
-	#name : 'ScpMessageToSuperTrace',
-	#superclass : 'ScpMessageTrace',
+	#name : 'ScpInstruction',
+	#superclass : 'ScpTrace',
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
 
 { #category : 'testing' }
-ScpMessageToSuperTrace >> isMessageToSuper [
-
+ScpInstruction >> isInstruction [
+	
 	^ true
 ]

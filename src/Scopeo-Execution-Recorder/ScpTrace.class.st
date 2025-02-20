@@ -2,8 +2,8 @@ Class {
 	#name : 'ScpTrace',
 	#superclass : 'Object',
 	#instVars : [
-		'previous',
-		'next'
+		'parent',
+		'children'
 	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
@@ -15,8 +15,38 @@ ScpTrace class >> isAbstract [
 	^ self == ScpTrace
 ]
 
+{ #category : 'adding' }
+ScpTrace >> addChild: anObject [
+
+	children add: anObject
+]
+
+{ #category : 'accessing' }
+ScpTrace >> children [
+
+	^ children
+]
+
+{ #category : 'accessing' }
+ScpTrace >> children: anObject [
+
+	children := anObject
+]
+
+{ #category : 'initialization' }
+ScpTrace >> initialize [
+
+	children := OrderedCollection new
+]
+
 { #category : 'testing' }
 ScpTrace >> isAssignment [
+
+	^ false
+]
+
+{ #category : 'testing' }
+ScpTrace >> isInstruction [
 
 	^ false
 ]
@@ -27,27 +57,33 @@ ScpTrace >> isMessage [
 	^ false
 ]
 
-{ #category : 'accessing' }
-ScpTrace >> next [
+{ #category : 'testing' }
+ScpTrace >> isMethod [
 
-	^ next
+	^ false
+]
+
+{ #category : 'testing' }
+ScpTrace >> isRoot [
+
+	^ false
 ]
 
 { #category : 'accessing' }
-ScpTrace >> next: aNext [
+ScpTrace >> parent [
 
-	next := aNext
+	^ parent
 ]
 
 { #category : 'accessing' }
-ScpTrace >> previous [
+ScpTrace >> parent: anObject [
 
-	^ previous
+	parent := anObject.
+	parent addChild: self 
 ]
 
-{ #category : 'accessing' }
-ScpTrace >> previous: aTask [
+{ #category : 'as yet unclassified' }
+ScpTrace >> siblings [
 
-	aTask next: self.
-	previous := aTask.
+	^ self parent children copy remove: self
 ]

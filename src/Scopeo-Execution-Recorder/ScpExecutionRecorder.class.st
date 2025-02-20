@@ -86,7 +86,7 @@ ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue n
 
 	<debuggerCompleteToSender>
 
-	execution add: (ScpAssignmentTrace new
+	execution instruction: (ScpAssignment new
 		variable: aVariable;
 		object: anObject;
 		oldValue: anOldValue;
@@ -123,26 +123,24 @@ ScpExecutionRecorder >> execute: aMethod for: aReceiver with: anArguments [
 ]
 
 { #category : 'private' }
-ScpExecutionRecorder >> execute: aSelector in: aClass for: aReceiver with: anArgument [
+ScpExecutionRecorder >> execute: aSelector in: aClass for: aReceiver with: anArguments [
 	
 	<debuggerCompleteToSender>
 	
 	| method arguments |
 
-	arguments := anArgument.
+	arguments := anArguments.
 	method := self lookup: aSelector in: aClass for: aReceiver.
 	method selector = #doesNotUnderstand: ifTrue: [
 		arguments := { 
 			MessageSend 
 				receiver: aReceiver 
 				selector: aSelector 
-				arguments: anArgument
+				arguments: anArguments
 		 }
 	].
 
-	^ aReceiver 
-			withArgs: arguments
-			executeMethod: method
+	^ self method: method receiver: aReceiver arguments: anArguments
 ]
 
 { #category : 'accessing' }
@@ -232,19 +230,51 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 
 	<debuggerCompleteToSender>
 
-	execution add: (ScpMessageTrace new
+	| message result |
+
+	message := ScpMessage new
 		selector: aNode selector;
 		sender: aSender;
 		receiver: aReceiver;
 		arguments: anArguments;
-		yourself
-	).	
-
-	^ self 
+		yourself.
+	
+	execution instruction: message.
+	
+	result := self 
 		execute: aNode selector 
 		in: aReceiver class 
 		for: aReceiver 
-		with: anArguments
+		with: anArguments.
+		
+
+	message result: result.
+	
+	^ result
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: anArguments [
+
+	| method result |
+
+	
+	method := aMethod isInstrumented 
+		ifTrue: [ ScpMethod new ]
+		ifFalse: [ ScpMethodUntraced new ].
+	
+	method method: aMethod original.
+	method receiver: aReceiver.
+	method arguments: anArguments.
+
+	execution method: method.
+		
+	result := method withArgs: anArguments executeMethod: aMethod. 
+	
+	execution return.
+	
+	^ result
+
 ]
 
 { #category : 'accessing' }
@@ -296,19 +326,26 @@ ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
 
 	<debuggerCompleteToSender>
 
-	execution add: (ScpMessageToSelfTrace new
+	| message result |
+
+	message := ScpMessageToSelf new
 		selector: aNode selector;
 		sender: aSender;
 		receiver: aSender;
 		arguments: anArguments;
-		yourself
-	).	
-
-	^ self 
+		yourself.
+	
+	execution instruction: message.
+	
+	result := self 
 		execute: aNode selector 
 		in: aSender class 
 		for: aSender 
-		with: anArguments
+		with: anArguments.
+
+	message result: result.
+	
+	^ result
 ]
 
 { #category : 'accessing' }
@@ -327,18 +364,26 @@ ScpExecutionRecorder >> semaphore: anObject [
 ScpExecutionRecorder >> super: aNode sender: aSender arguments: anArguments [
 
 	<debuggerCompleteToSender>
+	
+	| message result |
 
-	execution add: (ScpMessageToSuperTrace new
+	message := ScpMessageToSuper new
 		selector: aNode selector;
 		sender: aSender;
 		receiver: aSender;
 		arguments: anArguments;
-		yourself
-	).
-
-	^ self 
+		yourself.
+	
+	execution instruction: message.
+	
+	result := self 
 		execute: aNode selector 
 		in: aNode methodNode compiledMethod methodClass superclass
 		for: aSender 
-		with: anArguments
+		with: anArguments.
+
+	message result: result.
+	
+	^ result
+
 ]

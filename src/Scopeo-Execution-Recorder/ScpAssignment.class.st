@@ -1,6 +1,6 @@
 Class {
-	#name : 'ScpAssignmentTrace',
-	#superclass : 'ScpTrace',
+	#name : 'ScpAssignment',
+	#superclass : 'ScpInstruction',
 	#instVars : [
 		'variable',
 		'object',
@@ -12,7 +12,7 @@ Class {
 }
 
 { #category : 'testing' }
-ScpAssignmentTrace >> isAssignment [
+ScpAssignment >> isAssignment [
 
 	^ true
 
@@ -20,43 +20,43 @@ ScpAssignmentTrace >> isAssignment [
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> newValue [
+ScpAssignment >> newValue [
 
 	^ newValue
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> newValue: anObject [
+ScpAssignment >> newValue: anObject [
 
 	newValue := anObject
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> object [
+ScpAssignment >> object [
 
 	^ object
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> object: anObject [
+ScpAssignment >> object: anObject [
 
 	object := anObject
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> oldValue [
+ScpAssignment >> oldValue [
 
 	^ oldValue
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> oldValue: anObject [
+ScpAssignment >> oldValue: anObject [
 
 	oldValue := anObject
 ]
 
 { #category : 'printing' }
-ScpAssignmentTrace >> printOn: aStream [
+ScpAssignment >> printOn: aStream [
 
 	aStream 
 		<< 'Assignment: '
@@ -66,13 +66,13 @@ ScpAssignmentTrace >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> variable [
+ScpAssignment >> variable [
 
 	^ variable
 ]
 
 { #category : 'accessing' }
-ScpAssignmentTrace >> variable: anObject [
+ScpAssignment >> variable: anObject [
 
 	variable := anObject
 ]

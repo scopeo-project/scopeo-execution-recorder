@@ -2,30 +2,41 @@ Class {
 	#name : 'ScpExecution',
 	#superclass : 'Object',
 	#instVars : [
-		'traces'
+		'traces',
+		'stack'
 	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
 
-{ #category : 'adding' }
-ScpExecution >> add: aTrace [
-
-	traces ifNotEmpty: [ 
-		aTrace previous: traces last
-	].
-
-	traces add: aTrace.
-]
-
 { #category : 'initialization' }
 ScpExecution >> initialize [
 
-	traces := OrderedCollection new
+	stack := OrderedCollection new.
+	stack add: ScpRoot new
+]
+
+{ #category : 'adding' }
+ScpExecution >> instruction: anInstruction [
+
+	anInstruction parent: stack last
+]
+
+{ #category : 'adding' }
+ScpExecution >> method: aMethodTrace [
+
+	aMethodTrace parent: stack last children last.
+	stack add: aMethodTrace
+]
+
+{ #category : 'removing' }
+ScpExecution >> return [
+
+	stack removeLast
 ]
 
 { #category : 'accessing' }
-ScpExecution >> traces [
+ScpExecution >> root [
 
-	^ traces
+	^ stack first
 ]
