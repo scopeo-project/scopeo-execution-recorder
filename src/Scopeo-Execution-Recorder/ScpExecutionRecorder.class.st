@@ -10,7 +10,10 @@ Class {
 		'ignore',
 		'methods',
 		'process',
-		'semaphore'
+		'semaphore',
+		'result',
+		'return',
+		'isSuspended'
 	],
 	#classInstVars : [
 		'recorders'
@@ -81,72 +84,75 @@ ScpExecutionRecorder class >> recorders [
 	^ recorders ifNil: [ recorders := WeakIdentityKeyDictionary new ]
 ]
 
-{ #category : 'private' }
-ScpExecutionRecorder >> assignment: aVariable object: anObject old: anOldValue new: aNewValue [
-
-	<debuggerCompleteToSender>
-
-	execution instruction: (ScpAssignment new
-		variable: aVariable;
-		object: anObject;
-		oldValue: anOldValue;
-		newValue: aNewValue;
-		yourself
-	).
-	
-	aVariable write: aNewValue to: anObject.
-
-	^ aNewValue
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> execute: aMethod for: aReceiver with: anArguments [
-
-	<debuggerCompleteToSender>
-
-	| result |
-	[  
-		result := aMethod 
-			valueWithReceiver: aReceiver 
-			arguments: anArguments.
-			
-		semaphore signal.
-	]
-	on: Exception do: [ :e | 
-		"Unlock waiting processes in case an exception is not caught earlier."
-		semaphore signal.
-		e pass.
-	].
-	
-	^ result
-
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> execute: aSelector in: aClass for: aReceiver with: anArguments [
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> executeMessage: aScpMessage [ 
 	
 	<debuggerCompleteToSender>
 	
-	| method arguments |
+	| method arguments class |
+	
+	aScpMessage crTrace.
+	
+	class := aScpMessage node isSuperSend 
+		ifTrue: [ aScpMessage receiver class superclass ]
+		ifFalse: [ aScpMessage receiver class ].
 
-	arguments := anArguments.
-	method := self lookup: aSelector in: aClass for: aReceiver.
+	method := self lookup: aScpMessage node selector in: class.
 	method selector = #doesNotUnderstand: ifTrue: [
 		arguments := { 
 			MessageSend 
-				receiver: aReceiver 
-				selector: aSelector 
-				arguments: anArguments
+				receiver: aScpMessage receiver 
+				selector: aScpMessage node selector 
+				arguments: aScpMessage arguments 
 		 }
 	].
 
-	^ self method: method receiver: aReceiver arguments: anArguments
+	^ self recordMethod: method onReceiver: aScpMessage receiver withArguments: aScpMessage arguments 
+]
+
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> executeMethod: aCompiledMethod onReceiver: aReceiver withArgument: aArguments [
+
+	result := self 
+		recordMethod: (self method: aCompiledMethod)
+		onReceiver: aReceiver
+		withArguments: aArguments.
+		
+	isSuspended := process isSuspended.
+	
+	semaphore signal.
+	process suspend
 ]
 
 { #category : 'accessing' }
 ScpExecutionRecorder >> execution [
 
 	^ execution
+]
+
+{ #category : 'parameters' }
+ScpExecutionRecorder >> execution: aScpExecution [
+
+	execution := aScpExecution
+	
+]
+
+{ #category : 'private - handling' }
+ScpExecutionRecorder >> handleAssignment: anAssignmentOperation [
+
+	<debuggerCompleteToSender>
+
+	self recordAssignment: anAssignmentOperation.
+
+	^ anAssignmentOperation performDefaultOperation
+]
+
+{ #category : 'private - handling' }
+ScpExecutionRecorder >> handleMessage: aMessageOperation [
+
+	<debuggerCompleteToSender>
+
+	^ self recordMessage: aMessageOperation 
 ]
 
 { #category : 'parameters' }
@@ -158,45 +164,52 @@ ScpExecutionRecorder >> ignore: aBlock [
 { #category : 'initialization' }
 ScpExecutionRecorder >> initialize [
 
-	execution := ScpExecution new.
 	methods := Dictionary new.
-		
+	semaphore := Semaphore new.
+	
 	ignore := [ :m | false ].
 	
 	instrumentation := ScpMethodInstrumentation new.
 	instrumentation addIndirection: (ScpAssignmentIndirection new
+		reifyNode; reifyObject; reifyOldValue; reifyNewValue;
 		condition: [ :n | n variable isInstanceVariable ];
 		handler: self;
-		selector: #assignment:object:old:new:;
-		arguments: #( variable object oldValue newValue );
+		handlerSelector: #handleAssignment:;
 		yourself 
 	).
 	instrumentation addIndirection: (ScpMessageIndirection new
-		condition: [ :n | n isSelfSend ];
+		reifyNode; reifySender; reifyReceiver; reifyArguments;
 		handler: self;
-		selector: #self:sender:arguments:;
-		arguments: #( node sender arguments );
+		handlerSelector: #handleMessage:;
 		yourself 
-	).
-	instrumentation addIndirection: (ScpMessageIndirection new
-		condition: [ :n | n isSuperSend ];
-		handler: self;
-		selector: #super:sender:arguments:;
-		arguments: #( node sender arguments );
-		yourself 
-	).
-	instrumentation addIndirection: (ScpMessageIndirection new
-		condition: [ :n | (n isSelfSend or: [ n isSuperSend ]) not ];
-		handler: self;
-		selector: #message:sender:receiver:arguments:;
-		arguments: #( node sender receiver arguments );
-		yourself 
-	).
+	)
 
 ]
 
-{ #category : 'private' }
-ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> instrumentContext [
+
+	| context |
+
+	context := process suspendedContext.
+	context
+		setSender: context sender 
+		receiver: self
+		method: (self class >> #executeMethod:onReceiver:withArgument:)
+		arguments: { context method . context receiver . context arguments }
+
+]
+
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> isIntrumentableContext [
+
+	^ process suspendedContext method isCompiledMethod and: [ 
+		process suspendedContext receiver isBlock not 
+	]
+]
+
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> lookup: aSelector in: aClass [
 
 	| method |
 		
@@ -220,61 +233,15 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass for: aReceiver [
 			].
 		].
 
-	^ methods at: method name ifAbsentPut: [ 
-		instrumentation applyOn: method 
+	^ self method: method
+]
+
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> method: aMethod [
+
+	^ methods at: aMethod name ifAbsentPut: [ 
+		instrumentation applyOn: aMethod 
 	]
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver arguments: anArguments [
-
-	<debuggerCompleteToSender>
-
-	| message result |
-
-	message := ScpMessage new
-		selector: aNode selector;
-		sender: aSender;
-		receiver: aReceiver;
-		arguments: anArguments;
-		yourself.
-	
-	execution instruction: message.
-	
-	result := self 
-		execute: aNode selector 
-		in: aReceiver class 
-		for: aReceiver 
-		with: anArguments.
-		
-
-	message result: result.
-	
-	^ result
-]
-
-{ #category : 'as yet unclassified' }
-ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: anArguments [
-
-	| method result |
-
-	
-	method := aMethod isInstrumented 
-		ifTrue: [ ScpMethod new ]
-		ifFalse: [ ScpMethodUntraced new ].
-	
-	method method: aMethod original.
-	method receiver: aReceiver.
-	method arguments: anArguments.
-
-	execution method: method.
-		
-	result := method withArgs: anArguments executeMethod: aMethod. 
-	
-	execution return.
-	
-	^ result
-
 ]
 
 { #category : 'accessing' }
@@ -283,107 +250,93 @@ ScpExecutionRecorder >> process [
 	^ process
 ]
 
-{ #category : 'accessing' }
-ScpExecutionRecorder >> process: anObject [
+{ #category : 'parameters' }
+ScpExecutionRecorder >> process: aProcess [
 
-	| context inst |
+	process := aProcess.
 
-	process := anObject.
-	context := process suspendedContext.
+	process isSuspended ifFalse: [ process suspend ].
+	isSuspended := true.
+
+	self stepToInstrumentableContext.
+
+	process isTerminated ifTrue: [ 
+		self error: 'Unable to find any valid method in the process execution - process terminated.'
+	].	
 	
+	self instrumentContext.
+		
+	[
+		[
+			semaphore wait.
 
-	inst := instrumentation copy
-		addIndirection: (ScpMethodIndirection new
-			handler: self;
-			selector: #execute:for:with:;
-			arguments: #(method receiver arguments);
-			yourself
-		);
-		yourself.
+			process 
+				return: process suspendedContext 
+				value: return.
+			
+			self stepToInstrumentableContext.
+			process isTerminated ifTrue: [ ^ self ].
+			self instrumentContext.
 	
-	context
-		setSender: context sender 
-		receiver: context receiver 
-		method: (inst applyOn: context method)
-		arguments: context arguments 
+			isSuspended ifFalse: [ process resume ].
+						
+		] doWhileTrue: [ true ]
+	] fork
 ]
 
-{ #category : 'services' }
-ScpExecutionRecorder >> run [
+{ #category : 'private - recording' }
+ScpExecutionRecorder >> recordAssignment: aScpAssignment [
 
-	process resume.
-	semaphore wait.
+	execution instruction: (ScpExecutionNode new
+		operation: aScpAssignment;
+		yourself
+	).
 ]
 
-{ #category : 'services' }
-ScpExecutionRecorder >> runAsynchronously [
+{ #category : 'private - recording' }
+ScpExecutionRecorder >> recordMessage: aScpMessage [
 
-	process resume
+	| result |
+
+	execution instruction: (ScpExecutionNode new
+		operation: aScpMessage;
+		yourself
+	).
+	
+	result := (self executeMessage: aScpMessage).
+
+	^ result	
 ]
 
-{ #category : 'private' }
-ScpExecutionRecorder >> self: aNode sender: aSender arguments: anArguments [
+{ #category : 'private - recording' }
+ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver withArguments: aArguments [
 
-	<debuggerCompleteToSender>
+	| method |
 
-	| message result |
+	method := ScpMethodOperation new.
+	method node: aCompiledMethod sourceNode.
+	method method: aCompiledMethod original.
+	method object: aReceiver.
+	method arguments: aArguments.
 
-	message := ScpMessageToSelf new
-		selector: aNode selector;
-		sender: aSender;
-		receiver: aSender;
-		arguments: anArguments;
-		yourself.
+	execution method: (ScpExecutionNode new 
+		recorded: aCompiledMethod isInstrumented;
+		operation: method;
+		yourself
+	).
+	aCompiledMethod isInstrumented ifTrue: [ aCompiledMethod name crTrace].
+		
+	result := aReceiver withArgs: aArguments executeMethod: aCompiledMethod. 
 	
-	execution instruction: message.
-	
-	result := self 
-		execute: aNode selector 
-		in: aSender class 
-		for: aSender 
-		with: anArguments.
-
-	message result: result.
+	aCompiledMethod isInstrumented ifTrue: [ execution return ].
 	
 	^ result
 ]
 
-{ #category : 'accessing' }
-ScpExecutionRecorder >> semaphore [
-
-	^ semaphore
-]
-
-{ #category : 'accessing' }
-ScpExecutionRecorder >> semaphore: anObject [
-
-	semaphore := anObject
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder >> super: aNode sender: aSender arguments: anArguments [
-
-	<debuggerCompleteToSender>
+{ #category : 'private - execution' }
+ScpExecutionRecorder >> stepToInstrumentableContext [
 	
-	| message result |
-
-	message := ScpMessageToSuper new
-		selector: aNode selector;
-		sender: aSender;
-		receiver: aSender;
-		arguments: anArguments;
-		yourself.
-	
-	execution instruction: message.
-	
-	result := self 
-		execute: aNode selector 
-		in: aNode methodNode compiledMethod methodClass superclass
-		for: aSender 
-		with: anArguments.
-
-	message result: result.
-	
-	^ result
-
+	[ process isTerminated or: [ self isIntrumentableContext ] ] whileFalse: [
+		process step
+   ]
 ]
