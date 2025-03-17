@@ -20,7 +20,7 @@ ScpExecutionList >> inspection [
 	<inspectorPresentationOrder: 1 title: 'Execution tree'>
 	
 	^ SpListPresenter new
-		items: self traces ;
+		items: self traces;
 		yourself
 ]
 
