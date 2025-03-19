@@ -42,7 +42,7 @@ ScpExecutionTree >> method: aMethodTrace [
 		aMethodTrace parent: stack last children last 
 	].
 
-	aMethodTrace isRecorded ifTrue: [ 	
+	aMethodTrace isTracked ifTrue: [ 	
 		stack add: aMethodTrace
 	]
 	
