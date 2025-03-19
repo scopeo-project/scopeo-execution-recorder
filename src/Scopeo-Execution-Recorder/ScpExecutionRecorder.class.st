@@ -13,7 +13,8 @@ Class {
 		'semaphore',
 		'return',
 		'isSuspended',
-		'rootInstrumentation'
+		'rootInstrumentation',
+		'ffiSelectors'
 	],
 	#classInstVars : [
 		'recorders',
@@ -168,8 +169,11 @@ ScpExecutionRecorder >> initialize [
 		handler: self;
 		handlerSelector: (self class >> #method:receiver:arguments:) selector;
 		yourself
-	)
+	).
 
+	ffiSelectors := (Smalltalk allClasses flatCollect: [ :c | c methods ])  
+		select: [ :m | m hasPragmaNamed: #ffiCalloutTranslator ] 
+		thenCollect: [ :m | m selector ]
 ]
 
 { #category : 'private - execution' }
@@ -184,6 +188,12 @@ ScpExecutionRecorder >> instrumentContext [
 		method: (rootInstrumentation applyOn: context method)
 		arguments: context arguments
 
+]
+
+{ #category : 'testing' }
+ScpExecutionRecorder >> isFFIMethod: aMethod [
+
+   ^ aMethod sendNodes anySatisfy: [ :n | ffiSelectors includes: n selector ]
 ]
 
 { #category : 'private - execution' }
@@ -231,6 +241,7 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass [
 				(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
 				(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
 				(ignore value: method) ifTrue: [ ^ method ].
+				(self isFFIMethod: method) ifTrue: [ ^ method ]
 			].
 		].
 
