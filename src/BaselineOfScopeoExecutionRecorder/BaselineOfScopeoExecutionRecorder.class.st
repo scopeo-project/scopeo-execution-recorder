@@ -19,7 +19,7 @@ BaselineOfScopeoExecutionRecorder >> baseline: spec [
 BaselineOfScopeoExecutionRecorder >> dependencies: spec [
 
 	spec baseline: 'ScopeoInstrumentation' with: [
-		spec repository: 'github://scopeo-project/scopeo-instrumentation:main' 
+		spec repository: 'github://scopeo-project/scopeo-instrumentation:main'
 	].		
 	
 ]
@@ -27,5 +27,8 @@ BaselineOfScopeoExecutionRecorder >> dependencies: spec [
 { #category : 'baselines' }
 BaselineOfScopeoExecutionRecorder >> packages: spec [
 
-	spec package: 'Scopeo-Execution-Recorder'
+	spec package: 'Scopeo-Execution-Recorder'.
+	spec package: 'Scopeo-Execution-Recorder-Tests' with: [ 
+		spec requires: #( 'Scopeo-Execution-Recorder' ) 
+	]
 ]
