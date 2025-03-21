@@ -80,12 +80,6 @@ ScpTrace >> isMethod [
 	^ false
 ]
 
-{ #category : 'testing' }
-ScpTrace >> isReturn [
-
-	^ false
-]
-
 { #category : 'accessing' }
 ScpTrace >> node [
 
