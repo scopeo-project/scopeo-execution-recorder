@@ -6,19 +6,29 @@ Class {
 }
 
 { #category : 'adding' }
-ScpExecution >> instruction: aScpExecutionNode [
+ScpExecution >> assignment: aScpAssignmentTrace [
 
 	self subclassResponsibility
 ]
 
 { #category : 'adding' }
-ScpExecution >> method: aScpExecutionNode [
+ScpExecution >> message: aScpMessageTrace [
+
+	self subclassResponsibility
+]
+
+{ #category : 'adding' }
+ScpExecution >> method: aScpMethodTrace [
 
 	self subclassResponsibility
 ]
 
 { #category : 'handling' }
-ScpExecution >> return [
+ScpExecution >> pop [
 
 	self subclassResponsibility
+]
+
+{ #category : 'debugging actions' }
+ScpExecution >> terminate [
 ]

@@ -8,6 +8,50 @@ Class {
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'converting' }
+ScpExecutionList >> asExecutionTree [
+
+
+	| methods stack index trace popped |
+	
+	self flag: 'Ugly code to debug the execution tree which does not want to correctly be built for some reasons.'.
+	
+	methods := OrderedCollection new.
+	stack := Stack new.
+	index := 1.
+		
+	[ index > traces size ] whileFalse: [
+		trace := traces at: index.	
+				
+		trace isMethod ifTrue: [ 
+			stack push: trace	
+		].
+	
+		(trace isMessage or: [ trace isAssignment ]) ifTrue: [ 
+			trace parent: stack top
+		].
+	
+		trace isReturn ifTrue: [ 
+			popped := stack pop.
+			stack ifEmpty: [ 
+				methods add: trace.
+			]
+		].
+	
+		index := index + 1	
+	].
+
+	^ ScpExecutionTree new 
+		methods: methods;
+		yourself 
+]
+
+{ #category : 'adding' }
+ScpExecutionList >> assignment: aScpAssignmentTrace [
+
+	traces add: aScpAssignmentTrace
+]
+
 { #category : 'handling' }
 ScpExecutionList >> initialize [
 
@@ -17,29 +61,28 @@ ScpExecutionList >> initialize [
 { #category : 'inspecting' }
 ScpExecutionList >> inspection [
 	
-	<inspectorPresentationOrder: 1 title: 'Execution tree'>
+	<inspectorPresentationOrder: 1 title: 'Execution traces'>
 	
-	^ SpListPresenter new
-		items: self traces;
-		yourself
+	^ ScpExecutionListPresenter on: self
+	
 ]
 
 { #category : 'adding' }
-ScpExecutionList >> instruction: aScpExecutionNode [
+ScpExecutionList >> message: aScpMessageTrace [
 
-	traces add: aScpExecutionNode
+	traces add: aScpMessageTrace
 ]
 
 { #category : 'adding' }
-ScpExecutionList >> method: aScpExecutionNode [
+ScpExecutionList >> method: aScpMethodTrace [
 
-	traces add: aScpExecutionNode
+	traces add: aScpMethodTrace
 ]
 
 { #category : 'handling' }
-ScpExecutionList >> return [
+ScpExecutionList >> pop [
 
-	"Do nothing"
+	traces add: ScpMethodReturn new
 ]
 
 { #category : 'handling' }

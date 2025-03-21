@@ -3,16 +3,24 @@ Class {
 	#superclass : 'ScpExecution',
 	#instVars : [
 		'stack',
-		'methods'
+		'methods',
+		'method'
 	],
 	#category : 'Scopeo-Execution-Recorder',
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'adding' }
+ScpExecutionTree >> assignment: aScpAssignmentTrace [
+
+	aScpAssignmentTrace parent: stack top
+
+]
+
 { #category : 'initialization' }
 ScpExecutionTree >> initialize [
 
-	stack := OrderedCollection new.
+	stack := Stack new.
 	methods := OrderedCollection new
 ]
 
@@ -21,30 +29,23 @@ ScpExecutionTree >> inspection [
 	
 	<inspectorPresentationOrder: 1 title: 'Execution tree'>
 	
-	^ SpTreePresenter new
-		roots: self methods ;
-		children: [ :node | node children ];
-		display: [ :node | node asString ];
-		expandRoots;
-		yourself
+	^ ScpExecutionTreePresenter on: self
 ]
 
 { #category : 'adding' }
-ScpExecutionTree >> instruction: anInstruction [
+ScpExecutionTree >> message: aScpMessageTrace [
 
-	anInstruction parent: stack last
+	aScpMessageTrace parent: stack top
+
 ]
 
 { #category : 'adding' }
 ScpExecutionTree >> method: aMethodTrace [
 
-	stack isEmpty ifFalse: [ 
-		aMethodTrace parent: stack last children last 
+	stack ifNotEmpty: [ :s |
+		aMethodTrace parent: s top children last 
 	].
-
-	aMethodTrace isTracked ifTrue: [ 	
-		stack add: aMethodTrace
-	]
+	stack push: aMethodTrace
 	
 ]
 
@@ -54,12 +55,21 @@ ScpExecutionTree >> methods [
 	^ methods
 ]
 
-{ #category : 'removing' }
-ScpExecutionTree >> return [
+{ #category : 'accessing' }
+ScpExecutionTree >> methods: aCollection [
 
-	| method |
-	method := stack removeLast.
-	stack ifEmpty: [ 
-		methods add: method 
-	]
+	methods := aCollection
+]
+
+{ #category : 'removing' }
+ScpExecutionTree >> pop [
+
+	method := stack pop
+
+]
+
+{ #category : 'debugging actions' }
+ScpExecutionTree >> terminate [
+
+	methods add: stack last
 ]

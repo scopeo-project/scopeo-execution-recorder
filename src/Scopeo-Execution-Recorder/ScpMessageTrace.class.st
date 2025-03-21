@@ -8,6 +8,12 @@ Class {
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'accessing' }
+ScpMessageTrace >> icon [
+
+	^ self iconNamed: #diveRight
+]
+
 { #category : 'testing' }
 ScpMessageTrace >> isMessage [
 

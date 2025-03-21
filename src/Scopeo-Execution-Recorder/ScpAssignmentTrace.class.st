@@ -9,6 +9,12 @@ Class {
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'accessing' }
+ScpAssignmentTrace >> icon [
+
+	^ self iconNamed: #changeUpdate
+]
+
 { #category : 'testing' }
 ScpAssignmentTrace >> isAssignment [
 

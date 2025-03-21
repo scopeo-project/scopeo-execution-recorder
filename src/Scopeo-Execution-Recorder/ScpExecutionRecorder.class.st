@@ -14,7 +14,8 @@ Class {
 		'return',
 		'isSuspended',
 		'rootInstrumentation',
-		'ffiSelectors'
+		'ffiSelectors',
+		'mustTrace'
 	],
 	#classInstVars : [
 		'recorders',
@@ -109,14 +110,13 @@ ScpExecutionRecorder class >> recorders [
 
 { #category : 'as yet unclassified' }
 ScpExecutionRecorder >> assignment: aNode object: anObject old: anOldValue new: aNewValue default: aDefault [
-
-	execution instruction: (ScpAssignmentTrace new
+	
+	execution assignment: (ScpAssignmentTrace new
 		node: aNode;
 		object: anObject;
 		oldValue: anOldValue;
 		newValue: aNewValue;
-		yourself
-	).
+		yourself).
 
 	^ aDefault value
 ]
@@ -145,7 +145,7 @@ ScpExecutionRecorder >> initialize [
 
 	methods := Dictionary new.
 	semaphore := Semaphore new.
-	
+
 	ignore := [ :m | false ].
 	
 	instrumentation := ScpMethodInstrumentation new.	
@@ -243,13 +243,12 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 
 	| method arguments class |
 
-	execution instruction: (ScpMessageTrace new
+	execution message: (ScpMessageTrace new
 		node: aNode;
 		object: aSender;
 		receiver: aReceiver;
 		arguments: aArguments;
-		yourself
-	).
+		yourself).
 
    class := aNode isSuperSend
 		ifTrue: [ aNode methodNode methodClass superclass ]
@@ -279,11 +278,18 @@ ScpExecutionRecorder >> method: aMethod [
 ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: aArguments [
 
 	| result |
-
-   result := self
-		recordMethod: (self method: aMethod)
-  		onReceiver: aReceiver
-    	withArguments: aArguments.
+	
+	[ 	
+		result := self
+			recordMethod: (self method: aMethod)
+  			onReceiver: aReceiver
+    		withArguments: aArguments.
+		
+		execution terminate.
+	] on: Exception do: [ :e | 
+		execution terminate. 
+		e pass 
+	].
 
    isSuspended := process isSuspended.
 
@@ -337,20 +343,16 @@ ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver with
    | trace |
 
    trace := aCompiledMethod isInstrumented 
-		ifTrue: [ ScpMethodTrace new ]
+		ifTrue: [ ScpMethodTrace new ] 
 		ifFalse: [ ScpMethodUntrackedTrace new ].
 
    trace node: aCompiledMethod sourceNode.
    trace object: aReceiver.
    trace arguments: aArguments.
 
-   execution method: trace.
-
-   trace result: (aReceiver 
-		withArgs: aArguments
-  		executeMethod: aCompiledMethod).
-
-   aCompiledMethod isInstrumented ifTrue: [ execution return ].
+	execution method: trace.
+	trace result: (aReceiver withArgs: aArguments executeMethod: aCompiledMethod).
+ 	execution pop.
 
    ^ trace result
 ]

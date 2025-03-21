@@ -5,6 +5,12 @@ Class {
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'accessing' }
+ScpMethodUntrackedTrace >> icon [
+
+	^ self iconNamed: #remotesManagerEditRemote
+]
+
 { #category : 'testing' }
 ScpMethodUntrackedTrace >> isTracked [
 

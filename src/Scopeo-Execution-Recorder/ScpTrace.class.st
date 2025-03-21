@@ -29,6 +29,12 @@ ScpTrace >> children [
 	^ children
 ]
 
+{ #category : 'accessing' }
+ScpTrace >> icon [
+
+	self subclassResponsibility
+]
+
 { #category : 'initialization' }
 ScpTrace >> initialize [
 
@@ -70,6 +76,12 @@ ScpTrace >> isMessage [
 
 { #category : 'testing' }
 ScpTrace >> isMethod [
+
+	^ false
+]
+
+{ #category : 'testing' }
+ScpTrace >> isReturn [
 
 	^ false
 ]

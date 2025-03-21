@@ -9,6 +9,12 @@ Class {
 	#package : 'Scopeo-Execution-Recorder'
 }
 
+{ #category : 'accessing' }
+ScpMethodTrace >> icon [
+
+	^ self iconNamed: #collection
+]
+
 { #category : 'testing' }
 ScpMethodTrace >> isMethod [
 
