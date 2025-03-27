@@ -6,8 +6,9 @@ Class {
 		'traceListPresenter',
 		'model'
 	],
-	#category : 'Scopeo-Execution-Recorder',
-	#package : 'Scopeo-Execution-Recorder'
+	#category : 'Scopeo-Execution-Recorder-Presenters',
+	#package : 'Scopeo-Execution-Recorder',
+	#tag : 'Presenters'
 }
 
 { #category : 'api' }

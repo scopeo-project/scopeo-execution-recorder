@@ -12,17 +12,18 @@ Class {
 		'process',
 		'semaphore',
 		'return',
-		'isSuspended',
 		'rootInstrumentation',
-		'ffiSelectors',
-		'mustTrace'
+		'isDebugged',
+		'propagationProcess',
+		'isRecording'
 	],
 	#classInstVars : [
 		'recorders',
 		'methods'
 	],
-	#category : 'Scopeo-Execution-Recorder',
-	#package : 'Scopeo-Execution-Recorder'
+	#category : 'Scopeo-Execution-Recorder-Recording',
+	#package : 'Scopeo-Execution-Recorder',
+	#tag : 'Recording'
 }
 
 { #category : 'as yet unclassified' }
@@ -47,65 +48,30 @@ ScpExecutionRecorder class >> enableDebugMode [
 ]
 
 { #category : 'parameters' }
-ScpExecutionRecorder class >> forBlock: aBlock [
+ScpExecutionRecorder class >> recordBlock: aBlock as: aScpExecutionClass [
 
-	aBlock isClean ifFalse: [
-		self error: 'Please use clean blocks only.' 
-	].
-	
-	^ self
-		forCode: aBlock sourceNode body formattedCode
-		inContext: aBlock outerContext
-		onReceiver: aBlock outerContext receiver
-]
-
-{ #category : 'private' }
-ScpExecutionRecorder class >> forCode: aCode inContext: aContext onReceiver: aReceiver [
-
-	| method methodClass arguments process |
-
-	methodClass := aContext
-		ifNil: [ aReceiver class ]
-		ifNotNil: [ aContext methodClass ].
-
-	method := methodClass compiler
-		source: aCode;
-		class: methodClass;
-		context: aContext;
-		isScripting: true;
-		compile.
-
-	arguments := #(  ).
-	method numArgs > 0 ifTrue: [
-		aContext ifNil: [
-			self error:'The method expects arguments, please provide a context from which to extract them.'
-		].
-		arguments := aContext arguments 
-	].
-
-	process := [ 
-		method valueWithReceiver: aReceiver arguments: arguments 
-	] newProcess.
-
-	[ process suspendedContext method == method ] whileFalse: [ process step ].
-	
-	^ self forProcess: process
+	^ self recordBlock: aBlock as: aScpExecutionClass ignore: nil 
 ]
 
 { #category : 'parameters' }
-ScpExecutionRecorder class >> forProcess: aProcess [
+ScpExecutionRecorder class >> recordBlock: aBlock as: aScpExecutionClass ignore: aIgnoreBlock [
 
-	^ self recorders at: aProcess ifAbsentPut: [ 
-		self new
-			process: aProcess;
-			yourself
-	]
-]
+	| recorder process |
+	
+	<noInstrumentation>
+	
+	process := Processor activeProcess.
+	recorder := self new
+			execution: aScpExecutionClass new;
+			ignore: aIgnoreBlock;
+			process: process;
+			yourself.
 
-{ #category : 'parameters' }
-ScpExecutionRecorder class >> recorders [
-
-	^ recorders ifNil: [ recorders := WeakIdentityKeyDictionary new ]
+	recorder startRecording.
+	aBlock value.
+	recorder stopRecording.
+	
+	^ recorder execution
 ]
 
 { #category : 'as yet unclassified' }
@@ -153,13 +119,13 @@ ScpExecutionRecorder >> initialize [
 		reifyNode; reifyObject; reifyOldValue; reifyNewValue; reifyDefault;
 		condition: [ :n | n variable isInstanceVariable ];
 		handler: self;
-		handlerSelector: (self class >> #assignment:object:old:new:default:) selector;
+		handlerSelector: (self class lookupSelector: #assignment:object:old:new:default:) selector;
 		yourself 
 	).
 	instrumentation addIndirection: (ScpMessageIndirection new
 		reifyNode; reifySender; reifyReceiver; reifyArguments;
 		handler: self;
-		handlerSelector: (self class >> #message:sender:receiver:arguments:) selector;
+		handlerSelector: (self class lookupSelector: #message:sender:receiver:arguments:) selector;
 		yourself 
 	).
 	
@@ -167,7 +133,7 @@ ScpExecutionRecorder >> initialize [
 	rootInstrumentation addIndirection: (ScpMethodIndirection new
 		reifyMethod; reifyReceiver; reifyArguments;
 		handler: self;
-		handlerSelector: (self class >> #method:receiver:arguments:) selector;
+		handlerSelector: (self class lookupSelector: #method:receiver:arguments:) selector;
 		yourself
 	)
 ]
@@ -176,7 +142,7 @@ ScpExecutionRecorder >> initialize [
 ScpExecutionRecorder >> instrumentContext [
 
 	| context |
-
+	
 	context := process suspendedContext.
 	context
 		setSender: context sender 
@@ -194,13 +160,14 @@ ScpExecutionRecorder >> isIntrumentableContext [
 	context := process suspendedContext.
 	
 	"self haltIf: [ context method isCompiledMethod and: [ context method selector = #new ] ]."
-	
 	^ context method isCompiledMethod and: [ 
 		context method isInstrumented not and: [
-		context receiver isPartOfInstrumentation not and: [
-			context receiver isBlock not and: [ context willFailReturn not ]
-		]
-	]
+			
+			(context method hasPragmaNamed: #noInstrumentation) not and: [  
+			context receiver isPartOfInstrumentation not and: [
+				context receiver isBlock not and: [ context willFailReturn not ]
+			]
+		]]
 	]
 ]
 
@@ -214,26 +181,11 @@ ScpExecutionRecorder >> isPartOfInstrumentation [
 ScpExecutionRecorder >> lookup: aSelector in: aClass [
 
 	| method |
-	
-	method := aClass lookupSelector: aSelector. 
-	method 
-		ifNil: [ 
-			method := aClass lookupSelector: #doesNotUnderstand:.	
-		] 
-		ifNotNil: [ 
-			method isInstrumented ifTrue: [ ^ method ].
-			method isPrimitive ifTrue: [ ^ method ].
-			(method pragmaAt: #noInstrumentation) ifNotNil: [ ^ method ].	
 
-			method methodClass = UndefinedObject ifFalse: [ 
-				method isFFIMethod ifTrue: [ ^ method ].
-				(method package name beginsWith: #Kernel) ifTrue: [ ^ method ].
-				(method package name beginsWith: #FreeType) ifTrue: [ ^ method ].
-				(method package name beginsWith: #UnifiedFFI) ifTrue: [ ^ method ].
-				(method package name beginsWith: #Collection) ifTrue: [ ^ method ].
-				(ignore value: method) ifTrue: [ ^ method ]
-			].
-		].
+	method := aClass lookupSelector: aSelector. 
+	method ifNil: [ 
+		method := aClass lookupSelector: #doesNotUnderstand:	
+	].
 
 	^ self method: method
 ]
@@ -269,6 +221,19 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 { #category : 'private - execution' }
 ScpExecutionRecorder >> method: aMethod [
 
+	aMethod isInstrumented ifTrue: [ ^ aMethod ].
+			"aMethod isPrimitive ifTrue: [ ^ aMethod ]."
+			(aMethod pragmaAt: #noInstrumentation) ifNotNil: [ ^ aMethod ].	
+
+			aMethod methodClass = UndefinedObject ifFalse: [ 
+				aMethod isFFIMethod ifTrue: [ ^ aMethod ].
+				(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ aMethod ].
+				(aMethod package name beginsWith: #FreeType) ifTrue: [ ^ aMethod ].
+				(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ aMethod ].
+				(aMethod package name beginsWith: #Collection) ifTrue: [ ^ aMethod ].
+				(ignore ifNil: [ false ] ifNotNil: [:i | i value: aMethod]) ifTrue: [ ^ aMethod ]
+			].
+
 	^ methods at: aMethod name ifAbsentPut: [ 
 		instrumentation applyOn: aMethod 
 	]
@@ -285,16 +250,17 @@ ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: aArgument
   			onReceiver: aReceiver
     		withArguments: aArguments.
 		
-		execution terminate.
+		execution terminate. 	
 	] on: Exception do: [ :e | 
-		execution terminate. 
+		'Scopeo recorder recorded an exception: ', e asString.
+		execution terminate.
 		e pass 
 	].
-
-   isSuspended := process isSuspended.
-
-   semaphore signal.
-   process suspend.
+	
+   propagationProcess isActive ifTrue: [ 
+		semaphore signal.
+		process suspend
+	].
 
 	^ result
 ]
@@ -308,33 +274,8 @@ ScpExecutionRecorder >> process [
 { #category : 'parameters' }
 ScpExecutionRecorder >> process: aProcess [
 
-	process := aProcess.
+	process := aProcess
 
-	process isSuspended ifFalse: [ process suspend ].
-	isSuspended := true.
-
-	self stepToInstrumentableContext.
-
-	process isTerminated ifTrue: [ 
-		self error: 'Unable to find any valid method in the process execution - process terminated.'
-	].	
-
-	self instrumentContext.
-	
-	[
-		[
-			semaphore wait.
-
-			self stepToInstrumentableContext.
-
-			process isTerminated ifTrue: [ ^ self ].
-
-			self instrumentContext.
-	
-			isSuspended ifFalse: [ process resume ].
-						
-		] doWhileTrue: [ true ]
-	] fork
 ]
 
 { #category : 'private - recording' }
@@ -357,10 +298,37 @@ ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver with
    ^ trace result
 ]
 
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorder >> startRecording [
+	
+	<noInstrumentation>
+	
+	propagationProcess := [
+		[
+			semaphore wait.
+			self stepToInstrumentableContext.
+			process isTerminated ifTrue: [ ^ self ].
+			self instrumentContext.
+			process resume
+		] doWhileTrue: [ true ]
+	] fork.
+
+	semaphore signal.
+	process suspend
+]
+
 { #category : 'private - execution' }
 ScpExecutionRecorder >> stepToInstrumentableContext [
 	
 	[ process isTerminated or: [ self isIntrumentableContext ] ] whileFalse: [
 		process step
    ]
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorder >> stopRecording [
+
+	<noInstrumentation>
+
+	propagationProcess doTerminationFromAnotherProcess 
 ]

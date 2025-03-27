@@ -1,34 +1,35 @@
 Class {
 	#name : 'ScpExecution',
 	#superclass : 'Object',
-	#category : 'Scopeo-Execution-Recorder',
-	#package : 'Scopeo-Execution-Recorder'
+	#instVars : [
+		'result',
+		'record'
+	],
+	#category : 'Scopeo-Execution-Recorder-Recording',
+	#package : 'Scopeo-Execution-Recorder',
+	#tag : 'Recording'
 }
 
-{ #category : 'adding' }
-ScpExecution >> assignment: aScpAssignmentTrace [
+{ #category : 'accessing' }
+ScpExecution >> record [
 
-	self subclassResponsibility
+	^ record
 ]
 
-{ #category : 'adding' }
-ScpExecution >> message: aScpMessageTrace [
+{ #category : 'accessing' }
+ScpExecution >> record: anObject [
 
-	self subclassResponsibility
+	record := anObject
 ]
 
-{ #category : 'adding' }
-ScpExecution >> method: aScpMethodTrace [
+{ #category : 'accessing' }
+ScpExecution >> result [
 
-	self subclassResponsibility
+	^ result
 ]
 
-{ #category : 'handling' }
-ScpExecution >> pop [
+{ #category : 'accessing' }
+ScpExecution >> result: anObject [
 
-	self subclassResponsibility
-]
-
-{ #category : 'debugging actions' }
-ScpExecution >> terminate [
+	result := anObject
 ]

@@ -1,31 +1,32 @@
 Class {
-	#name : 'ScpExecutionTree',
-	#superclass : 'ScpExecution',
+	#name : 'ScpExecutionRecordTree',
+	#superclass : 'ScpExecutionRecord',
 	#instVars : [
 		'stack',
 		'methods',
 		'method'
 	],
-	#category : 'Scopeo-Execution-Recorder',
-	#package : 'Scopeo-Execution-Recorder'
+	#category : 'Scopeo-Execution-Recorder-Recording',
+	#package : 'Scopeo-Execution-Recorder',
+	#tag : 'Recording'
 }
 
 { #category : 'adding' }
-ScpExecutionTree >> assignment: aScpAssignmentTrace [
+ScpExecutionRecordTree >> assignment: aScpAssignmentTrace [
 
 	aScpAssignmentTrace parent: stack top
 
 ]
 
 { #category : 'initialization' }
-ScpExecutionTree >> initialize [
+ScpExecutionRecordTree >> initialize [
 
 	stack := Stack new.
 	methods := OrderedCollection new
 ]
 
 { #category : 'inspecting' }
-ScpExecutionTree >> inspection [
+ScpExecutionRecordTree >> inspection [
 	
 	<inspectorPresentationOrder: 1 title: 'Execution tree'>
 	
@@ -33,14 +34,14 @@ ScpExecutionTree >> inspection [
 ]
 
 { #category : 'adding' }
-ScpExecutionTree >> message: aScpMessageTrace [
+ScpExecutionRecordTree >> message: aScpMessageTrace [
 
 	aScpMessageTrace parent: stack top
 
 ]
 
 { #category : 'adding' }
-ScpExecutionTree >> method: aMethodTrace [
+ScpExecutionRecordTree >> method: aMethodTrace [
 
 	stack ifNotEmpty: [ :s |
 		aMethodTrace parent: s top children last 
@@ -50,26 +51,32 @@ ScpExecutionTree >> method: aMethodTrace [
 ]
 
 { #category : 'accessing' }
-ScpExecutionTree >> methods [
+ScpExecutionRecordTree >> methods [
 
 	^ methods
 ]
 
 { #category : 'accessing' }
-ScpExecutionTree >> methods: aCollection [
+ScpExecutionRecordTree >> methods: aCollection [
 
 	methods := aCollection
 ]
 
 { #category : 'removing' }
-ScpExecutionTree >> pop [
+ScpExecutionRecordTree >> pop [
 
 	method := stack pop
 
 ]
 
 { #category : 'debugging actions' }
-ScpExecutionTree >> terminate [
+ScpExecutionRecordTree >> terminate [
 
-	methods add: stack last
+	stack 
+		ifEmpty: [ methods add: method ]
+		ifNotEmpty: [ :s |
+			methods add: s last		
+		]
+
+
 ]

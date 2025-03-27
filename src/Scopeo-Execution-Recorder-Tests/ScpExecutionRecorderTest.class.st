@@ -2,33 +2,55 @@ Class {
 	#name : 'ScpExecutionRecorderTest',
 	#superclass : 'TestCase',
 	#instVars : [
-		'semaphore'
+		'semaphore',
+		'instVar'
 	],
 	#category : 'Scopeo-Execution-Recorder-Tests',
 	#package : 'Scopeo-Execution-Recorder-Tests'
 }
 
-{ #category : 'tests' }
-ScpExecutionRecorderTest class >> testMethodWithArgument [
-]
-
 { #category : 'as yet unclassified' }
-ScpExecutionRecorderTest >> executeProcess: aProcess [
-
-	aProcess resume.
-	semaphore wait
-]
-
-{ #category : 'as yet unclassified' }
-ScpExecutionRecorderTest >> newProcessFor: aBlock [
+ScpExecutionRecorderTest >> methodUntracked [
 	
-	^ Process 
-		forContext: [ 
-			aBlock value.
-			semaphore signal.
-			Processor terminateRealActive.
-		] asContext 
-		priority: thisProcess priority.
+	^ 42 asString
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodUntrackedWithTrackedBlock: aBlock [
+	
+	^ aBlock value
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithArgument: anArgument [
+
+	^ anArgument
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithAssignment [
+
+	instVar := 42
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithEscapingTrackedBlock [
+	
+	^ self methodUntrackedWithTrackedBlock: [ 42 asString . 42 asString ]
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithException [
+
+	self error: 'Exception'
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithMultipleMessages [
+
+	42 asString.
+	52 asString
+	
 ]
 
 { #category : 'as yet unclassified' }
@@ -40,113 +62,142 @@ ScpExecutionRecorderTest >> setUp [
 ]
 
 { #category : 'tests' }
+ScpExecutionRecorderTest >> testMethodUntracked [
+
+	| execution |
+
+	"Act"
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodUntracked ]
+		as: ScpExecutionRecordTree
+		ignore: [:m | m = (self class >> #methodUntracked) ].
+		
+	"Assert"
+	self assert: execution methods isNotEmpty.
+
+	self assert: execution methods size equals: 1.
+	self assert: execution methods first isTracked not.
+	self assert: execution methods first object identicalTo: self
+]
+
+{ #category : 'tests' }
+ScpExecutionRecorderTest >> testMethodUntrackedWithTrackedBlock [
+
+	| execution |
+
+	"Act"
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodWithEscapingTrackedBlock ]
+		as: ScpExecutionRecordTree
+		ignore: [:m | 
+			m selector = #methodUntrackedWithTrackedBlock: or: [ 
+				m selector = #asString 
+			] 
+		].
+
+	"Assert"
+	self assert: execution methods isNotEmpty.
+	self assert: execution methods size equals: 1.
+	
+	self assert: execution methods first isMethod.
+	self assert: execution methods first isTracked.
+	self assert: execution methods first children isNotEmpty.
+	self assert: execution methods first children size equals: 1.
+	
+	self assert: execution methods first children first isMessage.
+	self assert: execution methods first children first children isNotEmpty.
+	
+	self assert: execution methods first children first children first isMethod.
+	self assert: execution methods first children first children first isTracked not.
+	
+	self assert: execution methods first children first children first children isNotEmpty.
+	self assert: execution methods first children first children first children first isMessage.
+	self assert: execution methods first children first children first children first node selector equals: #asString
+]
+
+{ #category : 'tests' }
 ScpExecutionRecorderTest >> testMethodWithArgument [
 
-	| bicycle execution recorder process |
-
-	"Arrange"
-	bicycle := ScpBicycle new.
-	execution := ScpExecutionList new.
-	
-	recorder := ScpExecutionRecorder new
-		execution: execution;
-		yourself.	
-
-	process := self newProcessFor: [ 
-		bicycle gear: 2.	
-		bicycle rpm: 10.
-	].
+	| execution |
 
 	"Act"
-	recorder process: process.
-	self executeProcess: process.	
-
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodWithArgument: 42 ]
+		as: ScpExecutionRecordTree.
+		
 	"Assert"
-	
-	self assert: execution traces size equals: 4.
+	self assert: execution methods isNotEmpty.
 
-	self assert: execution traces first isMethod.	
-	self assert: execution traces first node selector equals: #gear:.
+	self assert: execution methods size equals: 1.
+	self assert: execution methods first object identicalTo: self.
 
-	self assert: execution traces second isAssignment.
-	self assert: execution traces second node variable name equals: #gear.
-	
-	self assert: execution traces third isMethod.	
-	self assert: execution traces third node selector equals: #rpm:.
-	
-	self assert: execution traces fourth isAssignment.
-	self assert: execution traces fourth node variable name equals: #rpm.
-	
+	self assert: execution methods first arguments isNotEmpty.
+	self assert: execution methods first arguments size equals: 1.
+	self assert: execution methods first arguments first identicalTo: 42
 ]
 
 { #category : 'tests' }
-ScpExecutionRecorderTest >> testMethodWithObservableVariable [
+ScpExecutionRecorderTest >> testMethodWithAssignment [
 
-	| bicycle execution recorder process |
-
-	"Arrange"
-	bicycle := ScpBicycle new.
-	bicycle gear: 2.	
-	bicycle rpm: 10.
-	
-	execution := ScpExecutionList new.
-	recorder := ScpExecutionRecorder new
-		execution: execution;
-		yourself.	
-
-	process := self newProcessFor: [ 
-		bicycle break
-	].
+	| execution |
 
 	"Act"
-	recorder process: process.
-	self executeProcess: process.	
-
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodWithAssignment ]
+		as: ScpExecutionRecordTree.
+		
 	"Assert"
-	
-	self assert: execution traces size equals: 2.
+	self assert: execution methods isNotEmpty.
 
-	self assert: execution traces first isMethod.	
-	self assert: execution traces first node selector equals: #break.
+	self assert: execution methods size equals: 1.
+	self assert: execution methods first isMethod.
+	self assert: execution methods first object identicalTo: self.
 
-	self assert: execution traces second isAssignment.
-	self assert: execution traces second node variable name equals: #status.
-	
-	self assert: bicycle speed equals: 0
+	self assert: execution methods first children isNotEmpty.
+	self assert: execution methods first children first oldValue isNil.
+	self assert: execution methods first children first newValue equals: 42.
+	self assert: execution methods first children first object identicalTo: self
 ]
 
 { #category : 'tests' }
-ScpExecutionRecorderTest >> testMethodWithSuperSend [
+ScpExecutionRecorderTest >> testMethodWithException [
 
-	| bicycle execution recorder process |
+	| block |
 
 	"Arrange"
-	bicycle := ScpBicycle new.
-	execution := ScpExecutionList new.
+	block := [
+		ScpExecutionRecorder 
+			recordBlock: [ self methodWithException ]
+			as: ScpExecutionRecordTree 
+	].	  
 	
-	recorder := ScpExecutionRecorder new
-		execution: execution;
-		yourself.	
+	"Assert"
+	self should: block raise: Error description: 'Exception'.
+]
 
-	process := self newProcessFor: [ 
-		bicycle drive
-	].
+{ #category : 'tests' }
+ScpExecutionRecorderTest >> testMethodWithMultipleMessages [
+
+	| execution |
 
 	"Act"
-	recorder process: process.
-	self executeProcess: process.	
-
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodWithMultipleMessages ]
+		as: ScpExecutionRecordTree.
+		
 	"Assert"
-	self assert: execution traces size equals: 3.
-	self assert: execution traces first isMethod.	
-	self assert: execution traces first node selector equals: #drive.
-	self assert: execution traces first node compiledMethod methodClass equals: ScpBicycle.
+	self assert: execution methods isNotEmpty.
 
-	self assert: execution traces second isMessage.
-	self assert: execution traces second node isSuperSend.
-	self assert: execution traces second node selector equals: #drive.
+	self assert: execution methods size equals: 1.
+	self assert: execution methods first isMethod.
+	self assert: execution methods first object identicalTo: self.
 
-	self assert: execution traces third isMethod.	
-	self assert: execution traces third node selector equals: #drive.
-	self assert: execution traces third node compiledMethod methodClass equals: ScpVehicle.
+	self assert: execution methods first children isNotEmpty.
+	self assert: execution methods first children size equals: 2.
+	
+	self assert: execution methods first children first isMessage.
+	self assert: execution methods first children first receiver equals: 42.
+	
+	self assert: execution methods first children second isMessage.
+	self assert: execution methods first children second receiver equals: 52
 ]

@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'arguments'
 	],
-	#category : 'Scopeo-Execution-Recorder',
-	#package : 'Scopeo-Execution-Recorder'
+	#category : 'Scopeo-Execution-Recorder-Traces',
+	#package : 'Scopeo-Execution-Recorder',
+	#tag : 'Traces'
 }
 
 { #category : 'testing' }
