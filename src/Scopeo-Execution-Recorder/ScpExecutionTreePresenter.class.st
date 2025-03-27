@@ -18,6 +18,25 @@ ScpExecutionTreePresenter >> activateOnSingleClick [
 ]
 
 { #category : 'initialization' }
+ScpExecutionTreePresenter >> connectPresenters [
+
+	traceTreePresenter eventHandler whenKeyDownDo: [ :e |
+		| path |
+		
+		path := traceTreePresenter selection selectedPath.
+		e key = KeyboardKey left ifTrue: [ 
+			traceTreePresenter collapsePath: path
+		].
+		e key = KeyboardKey right ifTrue: [ 
+			traceTreePresenter expandPath: path
+		].
+		(e key = KeyboardKey left or: [ e key = KeyboardKey right ]) ifTrue: [
+			traceTreePresenter selectPath: path 
+		]
+	]
+]
+
+{ #category : 'initialization' }
 ScpExecutionTreePresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
@@ -30,9 +49,9 @@ ScpExecutionTreePresenter >> defaultLayout [
 ScpExecutionTreePresenter >> initializePresenters [
 
 	traceTreeLabel := self newLabel
-		label: 'Number of methods: ', model methods size asString;
+		label: 'Number of methods: ', model methods size asString , ', number of traces: ', model traceQuantity asString;
 		yourself.
-		
+			
 	traceTreePresenter := self newTree
 		roots: model methods;
 		children: [ :node | node children ];

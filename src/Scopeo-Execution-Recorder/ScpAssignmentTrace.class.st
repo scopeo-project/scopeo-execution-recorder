@@ -10,6 +10,12 @@ Class {
 	#tag : 'Traces'
 }
 
+{ #category : 'visiting' }
+ScpAssignmentTrace >> accept: aScpExecutionRecordVisitor [
+
+	^ aScpExecutionRecordVisitor visitAssignmentTrace: self
+]
+
 { #category : 'accessing' }
 ScpAssignmentTrace >> icon [
 

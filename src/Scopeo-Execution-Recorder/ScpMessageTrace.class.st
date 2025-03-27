@@ -9,6 +9,12 @@ Class {
 	#tag : 'Traces'
 }
 
+{ #category : 'visiting' }
+ScpMessageTrace >> accept: aScpExecutionRecordVisitor [
+
+	^ aScpExecutionRecordVisitor visitMessageTrace: self
+]
+
 { #category : 'accessing' }
 ScpMessageTrace >> icon [
 

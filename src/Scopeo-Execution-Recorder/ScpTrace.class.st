@@ -18,6 +18,12 @@ ScpTrace class >> isAbstract [
 	^ self == ScpTrace
 ]
 
+{ #category : 'visiting' }
+ScpTrace >> accept: aScpExecutionRecordVisitor [
+
+	self subclassResponsibility
+]
+
 { #category : 'adding' }
 ScpTrace >> addChild: aScpTrace [
 

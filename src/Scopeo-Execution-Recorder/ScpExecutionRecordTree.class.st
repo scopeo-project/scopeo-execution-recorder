@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'stack',
 		'methods',
-		'method'
+		'method',
+		'traceQuantity'
 	],
 	#category : 'Scopeo-Execution-Recorder-Recording',
 	#package : 'Scopeo-Execution-Recorder',
@@ -14,15 +15,18 @@ Class {
 { #category : 'adding' }
 ScpExecutionRecordTree >> assignment: aScpAssignmentTrace [
 
-	aScpAssignmentTrace parent: stack top
-
+	aScpAssignmentTrace parent: stack top.
+	traceQuantity := traceQuantity + 1
 ]
 
 { #category : 'initialization' }
 ScpExecutionRecordTree >> initialize [
 
 	stack := Stack new.
-	methods := OrderedCollection new
+	methods := OrderedCollection new.
+	
+	traceQuantity := 0
+
 ]
 
 { #category : 'inspecting' }
@@ -36,7 +40,8 @@ ScpExecutionRecordTree >> inspection [
 { #category : 'adding' }
 ScpExecutionRecordTree >> message: aScpMessageTrace [
 
-	aScpMessageTrace parent: stack top
+	aScpMessageTrace parent: stack top.
+	traceQuantity := traceQuantity + 1
 
 ]
 
@@ -44,9 +49,10 @@ ScpExecutionRecordTree >> message: aScpMessageTrace [
 ScpExecutionRecordTree >> method: aMethodTrace [
 
 	stack ifNotEmpty: [ :s |
-		aMethodTrace parent: s top children last 
+		aMethodTrace parent: s top children last.
 	].
-	stack push: aMethodTrace
+	stack push: aMethodTrace.
+	traceQuantity := traceQuantity + 1
 	
 ]
 
@@ -79,4 +85,10 @@ ScpExecutionRecordTree >> terminate [
 		]
 
 
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecordTree >> traceQuantity [
+
+	^ traceQuantity
 ]
