@@ -76,6 +76,8 @@ ScpExecutionRecorder class >> recordBlock: aBlock as: aScpExecutionClass ignore:
 
 { #category : 'as yet unclassified' }
 ScpExecutionRecorder >> assignment: aNode object: anObject old: anOldValue new: aNewValue default: aDefault [
+
+	<noInstrumentation>
 	
 	execution assignment: (ScpAssignmentTrace new
 		node: aNode;
@@ -193,6 +195,7 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass [
 { #category : 'as yet unclassified' }
 ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver arguments: aArguments [
 
+	<noInstrumentation>
 	| method arguments class |
 
 	execution message: (ScpMessageTrace new
@@ -222,17 +225,17 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 ScpExecutionRecorder >> method: aMethod [
 
 	aMethod isInstrumented ifTrue: [ ^ aMethod ].
-			"aMethod isPrimitive ifTrue: [ ^ aMethod ]."
-			(aMethod pragmaAt: #noInstrumentation) ifNotNil: [ ^ aMethod ].	
+	"aMethod isPrimitive ifTrue: [ ^ aMethod ]."
+	(aMethod hasPragmaNamed: #noInstrumentation) ifTrue: [ ^ aMethod ].	
 
-			aMethod methodClass = UndefinedObject ifFalse: [ 
-				aMethod isFFIMethod ifTrue: [ ^ aMethod ].
-				(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ aMethod ].
-				(aMethod package name beginsWith: #FreeType) ifTrue: [ ^ aMethod ].
-				(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ aMethod ].
-				(aMethod package name beginsWith: #Collection) ifTrue: [ ^ aMethod ].
-				(ignore ifNil: [ false ] ifNotNil: [:i | i value: aMethod]) ifTrue: [ ^ aMethod ]
-			].
+	aMethod methodClass = UndefinedObject ifFalse: [ 
+		aMethod isFFIMethod ifTrue: [ ^ aMethod ].
+		(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ aMethod ].
+		(aMethod package name beginsWith: #FreeType) ifTrue: [ ^ aMethod ].
+		(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ aMethod ].
+		(aMethod package name beginsWith: #Collection) ifTrue: [ ^ aMethod ].
+		(ignore ifNil: [ false ] ifNotNil: [:i | i value: aMethod]) ifTrue: [ ^ aMethod ]
+	].
 
 	^ methods at: aMethod name ifAbsentPut: [ 
 		instrumentation applyOn: aMethod 
@@ -242,6 +245,7 @@ ScpExecutionRecorder >> method: aMethod [
 { #category : 'as yet unclassified' }
 ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: aArguments [
 
+	<noInstrumentation>
 	| result |
 	
 	[ 	
@@ -250,17 +254,11 @@ ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: aArgument
   			onReceiver: aReceiver
     		withArguments: aArguments.
 		
-		execution terminate. 	
-	] on: Exception do: [ :e | 
-		'Scopeo recorder recorded an exception: ', e asString.
-		execution terminate.
-		e pass 
-	].
-	
-   propagationProcess isActive ifTrue: [ 
-		semaphore signal.
-		process suspend
-	].
+		propagationProcess isActive ifTrue: [ 
+			semaphore signal.
+			process suspend
+		]
+	] ensure: [ execution terminate ].
 
 	^ result
 ]
@@ -281,6 +279,7 @@ ScpExecutionRecorder >> process: aProcess [
 { #category : 'private - recording' }
 ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver withArguments: aArguments [
 
+	<noInstrumentation>
    | trace |
 
    trace := aCompiledMethod isInstrumented 
@@ -291,9 +290,12 @@ ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver with
    trace object: aReceiver.
    trace arguments: aArguments.
 
-	execution method: trace.
-	trace result: (aReceiver withArgs: aArguments executeMethod: aCompiledMethod).
- 	execution pop.
+	[  
+		execution method: trace.
+		trace result: (aReceiver withArgs: aArguments executeMethod: aCompiledMethod).
+	] ensure: [ execution pop ]. 
+	self flag: 'I have no idea why I need the above ensure block.'
+		, 'To investigate, remove the ensure block and test with ScpExecutionRecorderTest >> #testMethodThatRequiresAnEnsureBlock'.
 
    ^ trace result
 ]
