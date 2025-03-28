@@ -144,7 +144,7 @@ ScpExecutionRecorder >> initialize [
 ScpExecutionRecorder >> instrumentContext [
 
 	| context |
-	
+
 	context := process suspendedContext.
 	context
 		setSender: context sender 

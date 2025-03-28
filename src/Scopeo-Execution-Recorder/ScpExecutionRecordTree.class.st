@@ -15,8 +15,11 @@ Class {
 { #category : 'adding' }
 ScpExecutionRecordTree >> assignment: aScpAssignmentTrace [
 
-	aScpAssignmentTrace parent: stack top.
-	traceQuantity := traceQuantity + 1
+	stack ifNotEmpty: [ :s |
+		aScpAssignmentTrace parent: s top.
+		traceQuantity := traceQuantity + 1
+	].
+
 ]
 
 { #category : 'initialization' }
@@ -40,8 +43,10 @@ ScpExecutionRecordTree >> inspection [
 { #category : 'adding' }
 ScpExecutionRecordTree >> message: aScpMessageTrace [
 
-	aScpMessageTrace parent: stack top.
-	traceQuantity := traceQuantity + 1
+	stack ifNotEmpty: [ :s |
+		aScpMessageTrace parent: s top.
+		traceQuantity := traceQuantity + 1
+	].
 
 ]
 
@@ -71,7 +76,10 @@ ScpExecutionRecordTree >> methods: aCollection [
 { #category : 'removing' }
 ScpExecutionRecordTree >> pop [
 
-	method := stack pop
+	stack ifNotEmpty: [ :s | 
+		method := s pop
+	]
+
 
 ]
 
