@@ -3,7 +3,8 @@ Class {
 	#superclass : 'TestCase',
 	#instVars : [
 		'semaphore',
-		'instVar'
+		'instVar',
+		'line'
 	],
 	#category : 'Scopeo-Execution-Recorder-Tests',
 	#package : 'Scopeo-Execution-Recorder-Tests'
@@ -40,6 +41,12 @@ ScpExecutionRecorderTest >> methodWithArgument: anArgument [
 ScpExecutionRecorderTest >> methodWithAssignment [
 
 	instVar := 42
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithAssignmentOfMessageResult [
+	
+	line := GLine through: 1 , 2 and: 3 , 5
 ]
 
 { #category : 'as yet unclassified' }
@@ -119,7 +126,7 @@ ScpExecutionRecorderTest >> testMethodThatRequiresAnEnsureBlock [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first isMethod.
 	self assert: execution methods first object identicalTo: self.
 
@@ -151,7 +158,7 @@ ScpExecutionRecorderTest >> testMethodUntracked [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first isTracked not.
 	self assert: execution methods first object identicalTo: self
 ]
@@ -173,7 +180,7 @@ ScpExecutionRecorderTest >> testMethodUntrackedWithTrackedBlock [
 
 	"Assert"
 	self assert: execution methods isNotEmpty.
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	
 	self assert: execution methods first isMethod.
 	self assert: execution methods first isTracked.
@@ -204,7 +211,7 @@ ScpExecutionRecorderTest >> testMethodUntrackedWithTrackedBlockAndIfNilBranch [
 
 	"Assert"
 	self assert: execution methods isNotEmpty.
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	
 	self assert: execution methods first isMethod.
 	self assert: execution methods first isTracked.
@@ -238,7 +245,7 @@ ScpExecutionRecorderTest >> testMethodWithArgument [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first object identicalTo: self.
 
 	self assert: execution methods first arguments isNotEmpty.
@@ -259,7 +266,7 @@ ScpExecutionRecorderTest >> testMethodWithAssignment [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first isMethod.
 	self assert: execution methods first object identicalTo: self.
 
@@ -267,6 +274,44 @@ ScpExecutionRecorderTest >> testMethodWithAssignment [
 	self assert: execution methods first children first oldValue isNil.
 	self assert: execution methods first children first newValue equals: 42.
 	self assert: execution methods first children first object identicalTo: self
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> testMethodWithAssignmentOfMessageResult [
+		
+	| execution |
+	
+	"Act"
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodWithAssignmentOfMessageResult ]
+		as: ScpExecutionRecordTree.
+
+	"Assert"
+	self assert: execution methods isNotEmpty.
+
+	self assert: execution methods size equals: 2.
+	self assert: execution methods first isMethod.
+	self assert: execution methods first object identicalTo: self.
+
+	self assert: execution methods first children isNotEmpty.
+	self assert: execution methods first children size equals: 4.
+	
+	self assert: execution methods first children first isMessage.
+	self assert: execution methods first children first receiver equals: 1.
+	self assert: execution methods first children first node selector equals: #,.
+	self assert: execution methods first children first arguments first equals: 2.
+	
+	self assert: execution methods first children second isMessage.
+	self assert: execution methods first children second receiver equals: 3.
+	self assert: execution methods first children second node selector equals: #,.
+	self assert: execution methods first children second arguments first equals: 5.
+	
+	self assert: execution methods first children third isMessage.
+	self assert: execution methods first children third sender equals: self.
+	self assert: execution methods first children third receiver equals: GLine.
+	self assert: execution methods first children third node selector equals: #through:and:.
+	
+	self assert: execution methods first children fourth isAssignment
 ]
 
 { #category : 'as yet unclassified' }
@@ -282,7 +327,7 @@ ScpExecutionRecorderTest >> testMethodWithBlockAndMessage [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first isMethod.
 	self assert: execution methods first object identicalTo: self.
 
@@ -325,7 +370,7 @@ ScpExecutionRecorderTest >> testMethodWithIfNilBranch [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first isMethod.
 	self assert: execution methods first object identicalTo: self.
 
@@ -358,7 +403,7 @@ ScpExecutionRecorderTest >> testMethodWithMultipleMessages [
 	"Assert"
 	self assert: execution methods isNotEmpty.
 
-	self assert: execution methods size equals: 1.
+	self assert: execution methods size equals: 2.
 	self assert: execution methods first isMethod.
 	self assert: execution methods first object identicalTo: self.
 

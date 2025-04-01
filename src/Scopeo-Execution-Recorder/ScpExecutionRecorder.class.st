@@ -15,7 +15,8 @@ Class {
 		'rootInstrumentation',
 		'isDebugged',
 		'propagationProcess',
-		'isRecording'
+		'isRecording',
+		'sync'
 	],
 	#classInstVars : [
 		'recorders',
@@ -86,7 +87,7 @@ ScpExecutionRecorder >> assignment: aNode object: anObject old: anOldValue new: 
 		newValue: aNewValue;
 		yourself).
 
-	^ aDefault value
+	^ aDefault value: aNewValue
 ]
 
 { #category : 'accessing' }
@@ -113,12 +114,12 @@ ScpExecutionRecorder >> initialize [
 
 	methods := Dictionary new.
 	semaphore := Semaphore new.
-
+	
 	ignore := [ :m | false ].
 	
 	instrumentation := ScpMethodInstrumentation new.	
 	instrumentation addIndirection: (ScpAssignmentIndirection new
-		reifyNode; reifyObject; reifyOldValue; reifyNewValue; reifyDefault;
+		reifyNode; reifyObject; reifyOldValue; reifyNewValue; reifyContinue;
 		condition: [ :n | n variable isInstanceVariable ];
 		handler: self;
 		handlerSelector: (self class lookupSelector: #assignment:object:old:new:default:) selector;
@@ -196,8 +197,8 @@ ScpExecutionRecorder >> lookup: aSelector in: aClass [
 ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver arguments: aArguments [
 
 	<noInstrumentation>
-	| method arguments class |
-
+	| method class |
+	
 	execution message: (ScpMessageTrace new
 		node: aNode;
 		object: aSender;
@@ -210,12 +211,6 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
   		ifFalse: [ aReceiver class ].
 
    method := self lookup: aNode selector in: class.
-	method selector = #doesNotUnderstand: ifTrue: [
- 		arguments := { (MessageSend
-                 receiver: aReceiver
-                 selector: aNode selector
-                 arguments: aArguments) }
-   ].
 
    ^ self recordMethod: method onReceiver: aReceiver withArguments: aArguments
 
@@ -247,18 +242,21 @@ ScpExecutionRecorder >> method: aMethod receiver: aReceiver arguments: aArgument
 
 	<noInstrumentation>
 	| result |
-	
-	[ 	
-		result := self
+
+	result := [
+
+		self
 			recordMethod: (self method: aMethod)
   			onReceiver: aReceiver
     		withArguments: aArguments.
-		
-		propagationProcess isActive ifTrue: [ 
+
+	] ensure: [ 
+		execution terminate. 
+		propagationProcess isTerminated ifFalse: [ 
 			semaphore signal.
 			process suspend
 		]
-	] ensure: [ execution terminate ].
+	].
 
 	^ result
 ]
@@ -280,19 +278,27 @@ ScpExecutionRecorder >> process: aProcess [
 ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver withArguments: aArguments [
 
 	<noInstrumentation>
-   | trace |
+   | trace arguments |
 
-   trace := aCompiledMethod isInstrumented 
+  arguments := aArguments.
+
+	(aCompiledMethod selector = #doesNotUnderstand:) ifTrue: [ 
+			arguments := { (MessageSend
+						receiver: aReceiver
+                 selector: aCompiledMethod selector 
+                 arguments: aArguments) }
+   	].
+  trace := aCompiledMethod isInstrumented 
 		ifTrue: [ ScpMethodTrace new ] 
 		ifFalse: [ ScpMethodUntrackedTrace new ].
 
    trace node: aCompiledMethod sourceNode.
    trace object: aReceiver.
-   trace arguments: aArguments.
+   trace arguments: arguments.
 
 	[  
 		execution method: trace.
-		trace result: (aReceiver withArgs: aArguments executeMethod: aCompiledMethod).
+		trace result: (aReceiver withArgs: arguments executeMethod: aCompiledMethod)
 	] ensure: [ execution pop ]. 
 	self flag: 'I have no idea why I need the above ensure block.'
 		, 'To investigate, remove the ensure block and test with ScpExecutionRecorderTest >> #testMethodThatRequiresAnEnsureBlock'.
