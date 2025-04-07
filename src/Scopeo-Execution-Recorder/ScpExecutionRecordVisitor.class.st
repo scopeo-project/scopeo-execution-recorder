@@ -9,12 +9,10 @@ Class {
 ScpExecutionRecordVisitor >> visitAssignmentTrace: aScpAssignmentTrace [
 
 	self 
-		assert: aScpAssignmentTrace children size <= 1 
+		assert: aScpAssignmentTrace children isEmpty
 		description: 'Inconsistency detected while visiting the record'.
 
-	aScpAssignmentTrace children ifNotEmpty: [ :c | 
-		c first accept: self  
-	]
+	^ aScpAssignmentTrace
 ]
 
 { #category : 'visiting' }
