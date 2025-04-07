@@ -2,7 +2,6 @@ Class {
 	#name : 'ScpExecutionRecordChecker',
 	#superclass : 'ScpExecutionRecordVisitor',
 	#instVars : [
-		'method',
 		'methods'
 	],
 	#category : 'Scopeo-Execution-Recorder',
@@ -15,6 +14,12 @@ ScpExecutionRecordChecker class >> check: aScpExecutionRecord [
 	self new visitExecutionRecord: aScpExecutionRecord.
 	
 	^ true
+]
+
+{ #category : 'visiting' }
+ScpExecutionRecordChecker >> initialize [
+
+	methods := Stack new
 ]
 
 { #category : 'visiting' }
@@ -48,4 +53,12 @@ ScpExecutionRecordChecker >> visitMessageTrace: aMessageTrace [
 			, ' attached to the wrong method trace ' 
 			, methods top methodClass name, ' >> #'
 			, methods top selector
+]
+
+{ #category : 'visiting' }
+ScpExecutionRecordChecker >> visitMethodTrace: aScpMethodTrace [
+
+	methods push: aScpMethodTrace node.
+	super visitMethodTrace: aScpMethodTrace.
+	methods pop
 ]
