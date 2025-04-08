@@ -49,24 +49,27 @@ ScpTrace >> initialize [
 ]
 
 { #category : 'inspecting' }
-ScpTrace >> inspection [
+ScpTrace >> inspectorPresenter [
 
-	<inspectorPresentationOrder: 1 title: 'Executed node'>
+	<inspectorPresentationOrder: 1 title: 'Trace details'>
 	
-	^ SpPresenter new
-		layout: (SpBoxLayout newVertical
-			add: 'In class: ', self node methodNode methodClass name height: 20;
-			add: (	SpCodePresenter new
-				beForMethod: self node methodNode;
-				text: self node methodNode source;
-				addTextSegmentDecoration: (SpTextPresenterDecorator forHighlight
-					interval: (self node start to: self node stop + 1);
-			 		yourself);
-				yourself);
-			yourself);
-		yourself
-	
+	^ self presenter
+]
 
+{ #category : 'inspecting' }
+ScpTrace >> inspectorPresenterForCode [
+
+	<inspectorPresentationOrder: 2 title: 'Trace node'>
+	
+	^ self presenterForCode
+]
+
+{ #category : 'inspecting' }
+ScpTrace >> inspectorPresenterForDetails [
+
+	<inspectorPresentationOrder: 3 title: 'Trace details'>
+	
+	^ self presenterForDetails
 ]
 
 { #category : 'testing' }
@@ -122,6 +125,24 @@ ScpTrace >> parent: aScpTrace [
 
 	parent := aScpTrace.
 	aScpTrace addChild: self
+]
+
+{ #category : 'accessing' }
+ScpTrace >> presenter [
+
+	^ ScpTracePresenter on: self
+]
+
+{ #category : 'presenters' }
+ScpTrace >> presenterForCode [
+
+	^ ScpTraceCodePresenter on: self
+]
+
+{ #category : 'presenters' }
+ScpTrace >> presenterForDetails [
+
+	^ self subclassResponsibility 
 ]
 
 { #category : 'printing' }

@@ -34,6 +34,12 @@ ScpMethodTrace >> isTracked [
 	^ true
 ]
 
+{ #category : 'presenters' }
+ScpMethodTrace >> presenterForDetails [
+
+	^ ScpMethodTraceDetailsPresenter on: self
+]
+
 { #category : 'printing' }
 ScpMethodTrace >> printOn: aStream [
 

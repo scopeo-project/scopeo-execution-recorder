@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'methods'
 	],
-	#category : 'Scopeo-Execution-Recorder',
-	#package : 'Scopeo-Execution-Recorder'
+	#category : 'Scopeo-Execution-Recorder-Visitors',
+	#package : 'Scopeo-Execution-Recorder',
+	#tag : 'Visitors'
 }
 
 { #category : 'validation' }

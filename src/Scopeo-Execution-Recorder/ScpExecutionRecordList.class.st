@@ -26,7 +26,7 @@ ScpExecutionRecordList >> inspection [
 	
 	<inspectorPresentationOrder: 1 title: 'Execution traces'>
 	
-	^ ScpExecutionListPresenter on: self
+	^ ScpExecutionRecordListPresenter on: self
 	
 ]
 

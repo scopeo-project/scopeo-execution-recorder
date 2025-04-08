@@ -52,6 +52,12 @@ ScpAssignmentTrace >> oldValue: anObject [
 	oldValue := anObject
 ]
 
+{ #category : 'presenters' }
+ScpAssignmentTrace >> presenterForDetails [
+
+	^ ScpAssignmentTraceDetailsPresenter on: self
+]
+
 { #category : 'printing' }
 ScpAssignmentTrace >> printOn: aStream [
 

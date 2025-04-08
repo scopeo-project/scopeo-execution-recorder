@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpExecutionListPresenter',
+	#name : 'ScpExecutionRecordListPresenter',
 	#superclass : 'SpPresenter',
 	#instVars : [
 		'traceListLabel',
@@ -11,14 +11,8 @@ Class {
 	#tag : 'Presenters'
 }
 
-{ #category : 'api' }
-ScpExecutionListPresenter >> activateOnSingleClick [
-
-	traceListPresenter activateOnSingleClick 
-]
-
 { #category : 'initialization' }
-ScpExecutionListPresenter >> defaultLayout [
+ScpExecutionRecordListPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
 		add: traceListLabel height: 20;
@@ -27,7 +21,7 @@ ScpExecutionListPresenter >> defaultLayout [
 ]
 
 { #category : 'initialization' }
-ScpExecutionListPresenter >> initializePresenters [
+ScpExecutionRecordListPresenter >> initializePresenters [
 
 	traceListLabel := self newLabel
 		label: 'Number of traces: ', model traces size asString;
@@ -40,13 +34,22 @@ ScpExecutionListPresenter >> initializePresenters [
 ]
 
 { #category : 'initialization' }
-ScpExecutionListPresenter >> outputActivationPort [
+ScpExecutionRecordListPresenter >> initializeWindow: aWindowPresenter [
 
-	^ traceListPresenter outputSelectionPort
+	super initializeWindow: aWindowPresenter.
+	aWindowPresenter
+		title: 'Scopeo execution record list presenter';
+		initialExtent: 800 @ 500
 ]
 
 { #category : 'accessing - model' }
-ScpExecutionListPresenter >> setModelBeforeInitialization: aDomainObject [
+ScpExecutionRecordListPresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecordListPresenter >> traceListPresenter [
+
+	^ traceListPresenter
 ]

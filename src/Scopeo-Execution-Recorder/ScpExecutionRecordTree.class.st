@@ -37,7 +37,7 @@ ScpExecutionRecordTree >> inspection [
 	
 	<inspectorPresentationOrder: 1 title: 'Execution tree'>
 	
-	^ ScpExecutionTreePresenter on: self
+	^ ScpExecutionRecordTreeInspectorPresenter on: self
 ]
 
 { #category : 'adding' }

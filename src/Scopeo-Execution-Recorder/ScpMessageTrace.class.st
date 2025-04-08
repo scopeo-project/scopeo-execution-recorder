@@ -27,6 +27,12 @@ ScpMessageTrace >> isMessage [
 	^ true
 ]
 
+{ #category : 'presenters' }
+ScpMessageTrace >> presenterForDetails [
+
+	^ ScpMessageTraceDetailsPresenter on: self
+]
+
 { #category : 'printing' }
 ScpMessageTrace >> printOn: aStream [
 

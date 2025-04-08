@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpExecutionTreePresenter',
+	#name : 'ScpExecutionRecordTreePresenter',
 	#superclass : 'SpPresenter',
 	#instVars : [
 		'traceTreeLabel',
@@ -11,14 +11,8 @@ Class {
 	#tag : 'Presenters'
 }
 
-{ #category : 'api' }
-ScpExecutionTreePresenter >> activateOnSingleClick [
-
-	traceTreePresenter activateOnSingleClick 
-]
-
-{ #category : 'initialization' }
-ScpExecutionTreePresenter >> connectPresenters [
+{ #category : 'as yet unclassified' }
+ScpExecutionRecordTreePresenter >> connectPresenters [
 
 	traceTreePresenter eventHandler whenKeyDownDo: [ :e |
 		| path |
@@ -37,7 +31,7 @@ ScpExecutionTreePresenter >> connectPresenters [
 ]
 
 { #category : 'initialization' }
-ScpExecutionTreePresenter >> defaultLayout [
+ScpExecutionRecordTreePresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
 		add: traceTreeLabel height: 20;
@@ -46,7 +40,7 @@ ScpExecutionTreePresenter >> defaultLayout [
 ]
 
 { #category : 'initialization' }
-ScpExecutionTreePresenter >> initializePresenters [
+ScpExecutionRecordTreePresenter >> initializePresenters [
 
 	traceTreeLabel := self newLabel
 		label: 'Number of methods: ', model methods size asString , ', number of traces: ', model traceQuantity asString;
@@ -62,13 +56,22 @@ ScpExecutionTreePresenter >> initializePresenters [
 ]
 
 { #category : 'initialization' }
-ScpExecutionTreePresenter >> outputActivationPort [
+ScpExecutionRecordTreePresenter >> initializeWindow: aWindowPresenter [
 
-	^ traceTreePresenter outputSelectionPort
+	super initializeWindow: aWindowPresenter.
+	aWindowPresenter
+		title: 'Scopeo execution record tree presenter';
+		initialExtent: 800 @ 500
 ]
 
 { #category : 'accessing - model' }
-ScpExecutionTreePresenter >> setModelBeforeInitialization: aDomainObject [
+ScpExecutionRecordTreePresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecordTreePresenter >> traceTreePresenter [
+
+	^ traceTreePresenter
 ]
