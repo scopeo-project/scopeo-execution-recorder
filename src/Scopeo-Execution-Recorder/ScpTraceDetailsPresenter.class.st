@@ -22,7 +22,7 @@ ScpTraceDetailsPresenter class >> isAbstract [
 ScpTraceDetailsPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
-		add: labelPresenter expand: false;
+		add: labelPresenter height: 20;
 		add: detailsTablePresenter;
 		yourself
 ]

@@ -27,7 +27,7 @@ ScpInvocationTraceDetailsPresenter >> defaultLayout [
 	^ SpPanedLayout newVertical
 		add: super defaultLayout;
 	   add: (SpBoxLayout newVertical 
-			add: 'Arguments: ' expand: false;
+			add: 'Arguments: ' height: 20;
 			add: argumentsListPresenter;
 			yourself	
 		);

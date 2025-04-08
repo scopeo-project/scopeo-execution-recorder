@@ -24,7 +24,7 @@ ScpTraceCodePresenter >> connectPresenters [
 ScpTraceCodePresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
-		add: labelPresenter expand: false;
+		add: labelPresenter height: 20;
 		add: codePresenter;
 		add: buttonPresenter expand: false;
 		yourself
