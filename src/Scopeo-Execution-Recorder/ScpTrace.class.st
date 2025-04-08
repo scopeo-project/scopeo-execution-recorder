@@ -51,7 +51,7 @@ ScpTrace >> initialize [
 { #category : 'inspecting' }
 ScpTrace >> inspectorPresenter [
 
-	<inspectorPresentationOrder: 1 title: 'Trace details'>
+	<inspectorPresentationOrder: 1 title: 'Trace'>
 	
 	^ self presenter
 ]
