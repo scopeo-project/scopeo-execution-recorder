@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'traceTreeLabel',
 		'model',
-		'traceTreePresenter'
+		'traceTreePresenter',
+		'onTraceSelected'
 	],
 	#category : 'Scopeo-Execution-Recorder-Presenters',
 	#package : 'Scopeo-Execution-Recorder',
@@ -16,16 +17,22 @@ ScpExecutionRecordTreePresenter >> connectPresenters [
 
 	traceTreePresenter eventHandler whenKeyDownDo: [ :e |
 		| path |
-		
+
 		path := traceTreePresenter selection selectedPath.
+	
 		e key = KeyboardKey left ifTrue: [ 
 			traceTreePresenter collapsePath: path
 		].
+	
 		e key = KeyboardKey right ifTrue: [ 
-			traceTreePresenter expandPath: path
-		].
-		(e key = KeyboardKey left or: [ e key = KeyboardKey right ]) ifTrue: [
-			traceTreePresenter selectPath: path 
+			traceTreePresenter expandPath: path.
+			traceTreePresenter selectPath: path scrollToSelection: true.
+		]
+	].
+
+	traceTreePresenter whenSelectionChangedDo: [ :selection | 
+		onTraceSelected ifNotNil: [ :hook | 
+			hook value: selection selectedItem 
 		]
 	]
 ]
@@ -51,6 +58,7 @@ ScpExecutionRecordTreePresenter >> initializePresenters [
 		children: [ :node | node children ];
 		display: [ :node | node asString ];
 		displayIcon: [ :node | node icon ];
+		beSingleSelection;
 		expandRoots;
 		yourself
 ]
@@ -64,6 +72,15 @@ ScpExecutionRecordTreePresenter >> initializeWindow: aWindowPresenter [
 		initialExtent: 800 @ 500
 ]
 
+{ #category : 'accessing' }
+ScpExecutionRecordTreePresenter >> selectTrace: aTrace [
+
+	traceTreePresenter selectItem: aTrace.
+	traceTreePresenter withAdapterPerformOrDefer: [ :anAdapter |
+		anAdapter scrollToSelection
+	]
+]
+
 { #category : 'accessing - model' }
 ScpExecutionRecordTreePresenter >> setModelBeforeInitialization: aDomainObject [
 
@@ -73,5 +90,13 @@ ScpExecutionRecordTreePresenter >> setModelBeforeInitialization: aDomainObject [
 { #category : 'accessing' }
 ScpExecutionRecordTreePresenter >> traceTreePresenter [
 
+	"This method exists onlye to expose the tree presenter to the inspector presenter."
+
 	^ traceTreePresenter
+]
+
+{ #category : 'event handling' }
+ScpExecutionRecordTreePresenter >> whenSelectedDo: aBlock [
+
+	onTraceSelected := aBlock
 ]

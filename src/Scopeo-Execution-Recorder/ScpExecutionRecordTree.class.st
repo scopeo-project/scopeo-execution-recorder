@@ -33,7 +33,7 @@ ScpExecutionRecordTree >> initialize [
 ]
 
 { #category : 'inspecting' }
-ScpExecutionRecordTree >> inspection [
+ScpExecutionRecordTree >> inspectorPresenter [
 	
 	<inspectorPresentationOrder: 1 title: 'Execution tree'>
 	
@@ -81,6 +81,13 @@ ScpExecutionRecordTree >> pop [
 	]
 
 
+]
+
+{ #category : 'presenters' }
+ScpExecutionRecordTree >> presenter [
+
+
+	^ ScpExecutionRecordTreePresenter on: self
 ]
 
 { #category : 'debugging actions' }

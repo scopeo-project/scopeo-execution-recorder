@@ -10,7 +10,7 @@ Class {
 	#tag : 'Presenters'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'inspector compatibility' }
 ScpExecutionRecordTreeInspectorPresenter >> activateOnSingleClick [
 
 	recordTreePresenter traceTreePresenter activateOnSingleClick 
@@ -30,14 +30,26 @@ ScpExecutionRecordTreeInspectorPresenter >> initializePresenters [
 	recordTreePresenter := ScpExecutionRecordTreePresenter on: model.
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'inspector compatibility' }
 ScpExecutionRecordTreeInspectorPresenter >> outputActivationPort [
 
 	^ recordTreePresenter traceTreePresenter outputSelectionPort
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecordTreeInspectorPresenter >> selectTrace: aScpTrace [
+
+	recordTreePresenter selectTrace: aScpTrace 
 ]
 
 { #category : 'accessing - model' }
 ScpExecutionRecordTreeInspectorPresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
+]
+
+{ #category : 'enumerating' }
+ScpExecutionRecordTreeInspectorPresenter >> whenSelectedDo: aBlock [
+
+	recordTreePresenter whenSelectedDo: aBlock
 ]

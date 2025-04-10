@@ -30,6 +30,15 @@ ScpExecutionRecordList >> inspection [
 	
 ]
 
+{ #category : 'inspecting' }
+ScpExecutionRecordList >> inspectorPresenter [
+	
+	<inspectorPresentationOrder: 1 title: 'Execution traces'>
+	
+	^ ScpExecutionRecordListInspectorPresenter on: self
+	
+]
+
 { #category : 'adding' }
 ScpExecutionRecordList >> message: aScpMessageTrace [
 
@@ -44,6 +53,12 @@ ScpExecutionRecordList >> method: aScpMethodTrace [
 
 { #category : 'handling' }
 ScpExecutionRecordList >> pop [
+]
+
+{ #category : 'presenters' }
+ScpExecutionRecordList >> presenter [
+
+	^ ScpExecutionRecordListPresenter on: self
 ]
 
 { #category : 'handling' }

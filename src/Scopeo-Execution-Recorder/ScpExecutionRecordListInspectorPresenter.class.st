@@ -10,7 +10,7 @@ Class {
 	#tag : 'Presenters'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'inspector compatibility' }
 ScpExecutionRecordListInspectorPresenter >> activateOnSingleClick [
 
 	recordListPresenter traceListPresenter activateOnSingleClick
@@ -30,7 +30,7 @@ ScpExecutionRecordListInspectorPresenter >> initializePresenters [
 	recordListPresenter := ScpExecutionRecordListPresenter on: model
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'inspector compatibility' }
 ScpExecutionRecordListInspectorPresenter >> outputActivationPort [
 
 	^ recordListPresenter traceListPresenter outputSelectionPort

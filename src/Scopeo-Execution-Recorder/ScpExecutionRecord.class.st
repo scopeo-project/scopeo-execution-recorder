@@ -30,6 +30,12 @@ ScpExecutionRecord >> pop [
 	self subclassResponsibility
 ]
 
+{ #category : 'presenters' }
+ScpExecutionRecord >> presenter [
+
+	self subclassResponsibility
+]
+
 { #category : 'debugging actions' }
 ScpExecutionRecord >> terminate [
 ]
