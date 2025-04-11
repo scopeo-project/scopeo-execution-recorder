@@ -15,7 +15,10 @@ Class {
 ScpExecutionRecordListPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
-		add: traceListLabel height: 20;
+		add: traceListLabel withConstraints: [ :constraints |
+			constraints expand: false.
+			constraints padding: 5
+		];
 		add: traceListPresenter;
 		yourself
 ]

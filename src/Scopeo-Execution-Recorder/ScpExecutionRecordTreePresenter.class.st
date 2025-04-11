@@ -12,7 +12,7 @@ Class {
 	#tag : 'Presenters'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'binding' }
 ScpExecutionRecordTreePresenter >> connectPresenters [
 
 	traceTreePresenter eventHandler whenKeyDownDo: [ :e |
@@ -41,7 +41,10 @@ ScpExecutionRecordTreePresenter >> connectPresenters [
 ScpExecutionRecordTreePresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
-		add: traceTreeLabel height: 20;
+		add: traceTreeLabel withConstraints: [ :constraints |
+			constraints expand: false.
+			constraints padding: 5
+		];
 		add: traceTreePresenter;
 		yourself
 ]

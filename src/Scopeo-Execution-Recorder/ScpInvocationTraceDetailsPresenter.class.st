@@ -27,7 +27,10 @@ ScpInvocationTraceDetailsPresenter >> defaultLayout [
 	^ SpPanedLayout newVertical
 		add: super defaultLayout;
 	   add: (SpBoxLayout newVertical 
-			add: 'Arguments: ' height: 20;
+			add: 'Arguments: ' withConstraints: [ :constraints |
+				constraints expand: false.
+				constraints padding: 5
+			];
 			add: argumentsListPresenter;
 			yourself	
 		);
@@ -35,7 +38,7 @@ ScpInvocationTraceDetailsPresenter >> defaultLayout [
 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'initialization' }
 ScpInvocationTraceDetailsPresenter >> initializePresenters [
 
 	super initializePresenters.
