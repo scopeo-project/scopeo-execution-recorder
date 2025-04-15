@@ -5,7 +5,8 @@ Class {
 		'model',
 		'contextMenuPresenter',
 		'detailsTablePresenter',
-		'labelPresenter'
+		'labelPresenter',
+		'iconPresenter'
 	],
 	#category : 'Scopeo-Execution-Recorder-Presenters',
 	#package : 'Scopeo-Execution-Recorder',
@@ -22,9 +23,13 @@ ScpTraceDetailsPresenter class >> isAbstract [
 ScpTraceDetailsPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
-		add: labelPresenter withConstraints: [ :constraints |
+		add: (SpBoxLayout newHorizontal
+			add: iconPresenter width: 20;
+			add: labelPresenter;
+			yourself
+		) withConstraints: [ :constraints | 
 			constraints expand: false.
-			constraints padding: 5
+			constraints padding: 5 
 		];
 		add: detailsTablePresenter;
 		yourself
@@ -32,6 +37,10 @@ ScpTraceDetailsPresenter >> defaultLayout [
 
 { #category : 'initialization' }
 ScpTraceDetailsPresenter >> initializePresenters [
+	
+	iconPresenter := self newImage 
+		image: model icon;
+		yourself.
 	
 	labelPresenter := self newLabel label: self label.
 	

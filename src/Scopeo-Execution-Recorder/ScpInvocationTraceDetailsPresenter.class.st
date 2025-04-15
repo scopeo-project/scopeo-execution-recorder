@@ -26,14 +26,7 @@ ScpInvocationTraceDetailsPresenter >> defaultLayout [
 
 	^ SpPanedLayout newVertical
 		add: super defaultLayout;
-	   add: (SpBoxLayout newVertical 
-			add: 'Arguments: ' withConstraints: [ :constraints |
-				constraints expand: false.
-				constraints padding: 5
-			];
-			add: argumentsListPresenter;
-			yourself	
-		);
+	   add: argumentsListPresenter;
 		yourself
 
 ]
@@ -44,6 +37,7 @@ ScpInvocationTraceDetailsPresenter >> initializePresenters [
 	super initializePresenters.
 
 	argumentsListPresenter := self newList
+		headerTitle: 'Arguments';
 		contextMenu: (SpMenuPresenter new
 			addGroup: [ :group | 
 				group addItem: [ :item | 
