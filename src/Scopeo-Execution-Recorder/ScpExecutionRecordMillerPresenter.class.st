@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpExecutionRecordTreePresenter',
+	#name : 'ScpExecutionRecordMillerPresenter',
 	#superclass : 'SpPresenter',
 	#instVars : [
 		'traceTreeLabel',
@@ -16,8 +16,22 @@ Class {
 	#tag : 'Presenters'
 }
 
+{ #category : 'as yet unclassified' }
+ScpExecutionRecordMillerPresenter >> connectPresenter: aPresenter [
+
+	aPresenter whenSelectedDo: [ :selection |
+		| index |
+		index := traceMillerPresenter pages indexOf: aPresenter.
+		traceMillerPresenter resetTo: index.
+		traceMillerPresenter addPresenter: (self connectPresenter: selection presenterForChildren).
+		traceMillerPresenter selectPage: index + 1
+	].
+
+	^ aPresenter
+]
+
 { #category : 'binding' }
-ScpExecutionRecordTreePresenter >> connectPresenters [
+ScpExecutionRecordMillerPresenter >> connectPresenters [
 
 	traceTreePresenter eventHandler whenKeyDownDo: [ :e |
 		| path |
@@ -34,44 +48,48 @@ ScpExecutionRecordTreePresenter >> connectPresenters [
 		]
 	].
 
-	traceTreePresenter whenSelectionChangedDo: [ :selection | 
+	"traceTreePresenter whenSelectionChangedDo: [ :selection | 
 		onTraceSelected ifNotNil: [ :hook | 
 			hook value: selection selectedItem 
 		]
-	]
+	]"
+
+	self connectPresenter: methodsPresenter.
+	methodsPresenter items: model methods
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordTreePresenter >> defaultLayout [
+ScpExecutionRecordMillerPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
 		add: traceTreeLabel withConstraints: [ :constraints |
 			constraints expand: false.
 			constraints padding: 5
 		];
-		add: traceTreePresenter;
+		spacing: 5;
+		add: traceMillerPresenter;
 		yourself
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordTreePresenter >> initializePresenters [
+ScpExecutionRecordMillerPresenter >> initializePresenters [
 
 	traceTreeLabel := self newLabel
 		label: 'Number of methods: ', model methods size asString , ', number of traces: ', model traceQuantity asString;
 		yourself.
 
-	traceTreePresenter := self newTree
-		roots: model methods;
-		children: [ :node | node children ];
-		display: [ :node | node asString ];
-		displayIcon: [ :node | node icon ];
-		beSingleSelection;
-		expandRoots;
-		yourself
+	traceMillerPresenter := SpMillerColumnPresenter new.
+	
+	methodsPresenter := self newList
+		headerTitle: 'Methods';
+		displayIcon: [ :trace | trace icon ] 
+		yourself.
+		
+	traceMillerPresenter addPresenter: methodsPresenter 
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordTreePresenter >> initializeWindow: aWindowPresenter [
+ScpExecutionRecordMillerPresenter >> initializeWindow: aWindowPresenter [
 
 	super initializeWindow: aWindowPresenter.
 	aWindowPresenter
@@ -80,7 +98,7 @@ ScpExecutionRecordTreePresenter >> initializeWindow: aWindowPresenter [
 ]
 
 { #category : 'accessing' }
-ScpExecutionRecordTreePresenter >> selectTrace: aTrace [
+ScpExecutionRecordMillerPresenter >> selectTrace: aTrace [
 
 	traceTreePresenter selectItem: aTrace.
 	traceTreePresenter withAdapterPerformOrDefer: [ :anAdapter |
@@ -89,13 +107,13 @@ ScpExecutionRecordTreePresenter >> selectTrace: aTrace [
 ]
 
 { #category : 'accessing - model' }
-ScpExecutionRecordTreePresenter >> setModelBeforeInitialization: aDomainObject [
+ScpExecutionRecordMillerPresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
 ]
 
 { #category : 'accessing' }
-ScpExecutionRecordTreePresenter >> traceTreePresenter [
+ScpExecutionRecordMillerPresenter >> traceTreePresenter [
 
 	"This method exists only to expose the tree presenter to the inspector presenter."
 
@@ -103,7 +121,7 @@ ScpExecutionRecordTreePresenter >> traceTreePresenter [
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordTreePresenter >> updatePresenter [
+ScpExecutionRecordMillerPresenter >> updatePresenter [
 
 	"1 to: 10 do: [ :index | | presenter |
 		presenter := SpListPresenter new
@@ -117,7 +135,7 @@ ScpExecutionRecordTreePresenter >> updatePresenter [
 ]
 
 { #category : 'event handling' }
-ScpExecutionRecordTreePresenter >> whenSelectedDo: aBlock [
+ScpExecutionRecordMillerPresenter >> whenSelectedDo: aBlock [
 
 	onTraceSelected := aBlock
 ]

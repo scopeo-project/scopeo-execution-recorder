@@ -37,7 +37,7 @@ ScpExecutionRecordTree >> inspectorPresenter [
 	
 	<inspectorPresentationOrder: 1 title: 'Execution tree'>
 	
-	^ ScpExecutionRecordTreeInspectorPresenter on: self
+	^ ScpExecutionRecordMillerInspectorPresenter on: self
 ]
 
 { #category : 'adding' }
@@ -87,7 +87,7 @@ ScpExecutionRecordTree >> pop [
 ScpExecutionRecordTree >> presenter [
 
 
-	^ ScpExecutionRecordTreePresenter on: self
+	^ ScpExecutionRecordMillerPresenter on: self
 ]
 
 { #category : 'debugging actions' }

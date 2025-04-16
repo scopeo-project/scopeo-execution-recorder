@@ -57,9 +57,17 @@ ScpTrace >> inspectorPresenter [
 ]
 
 { #category : 'inspecting' }
+ScpTrace >> inspectorPresenterForChildren [
+
+	<inspectorPresentationOrder: 2 title: 'Trace children'>
+	
+	^ ScpTraceChildrenInspectorPresenter on: self
+]
+
+{ #category : 'inspecting' }
 ScpTrace >> inspectorPresenterForCode [
 
-	<inspectorPresentationOrder: 2 title: 'Trace node'>
+	<inspectorPresentationOrder: 3 title: 'Trace node'>
 	
 	^ self presenterForCode
 ]
@@ -67,7 +75,7 @@ ScpTrace >> inspectorPresenterForCode [
 { #category : 'inspecting' }
 ScpTrace >> inspectorPresenterForDetails [
 
-	<inspectorPresentationOrder: 3 title: 'Trace details'>
+	<inspectorPresentationOrder: 4 title: 'Trace details'>
 	
 	^ self presenterForDetails
 ]
@@ -131,6 +139,12 @@ ScpTrace >> parent: aScpTrace [
 ScpTrace >> presenter [
 
 	^ ScpTracePresenter on: self
+]
+
+{ #category : 'presenters' }
+ScpTrace >> presenterForChildren [
+
+	^ ScpTraceChildrenPresenter on: self
 ]
 
 { #category : 'presenters' }

@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpExecutionRecordTreeInspectorPresenter',
+	#name : 'ScpExecutionRecordMillerInspectorPresenter',
 	#superclass : 'SpPresenter',
 	#instVars : [
 		'model',
@@ -11,13 +11,13 @@ Class {
 }
 
 { #category : 'inspector compatibility' }
-ScpExecutionRecordTreeInspectorPresenter >> activateOnSingleClick [
+ScpExecutionRecordMillerInspectorPresenter >> activateOnSingleClick [
 
 	recordTreePresenter traceTreePresenter activateOnSingleClick 
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordTreeInspectorPresenter >> defaultLayout [
+ScpExecutionRecordMillerInspectorPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
 		add: recordTreePresenter;
@@ -25,31 +25,31 @@ ScpExecutionRecordTreeInspectorPresenter >> defaultLayout [
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordTreeInspectorPresenter >> initializePresenters [
+ScpExecutionRecordMillerInspectorPresenter >> initializePresenters [
 
-	recordTreePresenter := ScpExecutionRecordTreePresenter on: model.
+	recordTreePresenter := ScpExecutionRecordMillerPresenter on: model.
 ]
 
 { #category : 'inspector compatibility' }
-ScpExecutionRecordTreeInspectorPresenter >> outputActivationPort [
+ScpExecutionRecordMillerInspectorPresenter >> outputActivationPort [
 
 	^ recordTreePresenter traceTreePresenter outputSelectionPort
 ]
 
 { #category : 'accessing' }
-ScpExecutionRecordTreeInspectorPresenter >> selectTrace: aScpTrace [
+ScpExecutionRecordMillerInspectorPresenter >> selectTrace: aScpTrace [
 
 	recordTreePresenter selectTrace: aScpTrace 
 ]
 
 { #category : 'accessing - model' }
-ScpExecutionRecordTreeInspectorPresenter >> setModelBeforeInitialization: aDomainObject [
+ScpExecutionRecordMillerInspectorPresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
 ]
 
 { #category : 'enumerating' }
-ScpExecutionRecordTreeInspectorPresenter >> whenSelectedDo: aBlock [
+ScpExecutionRecordMillerInspectorPresenter >> whenSelectedDo: aBlock [
 
 	recordTreePresenter whenSelectedDo: aBlock
 ]
