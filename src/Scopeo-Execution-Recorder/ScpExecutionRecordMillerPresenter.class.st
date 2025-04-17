@@ -29,7 +29,8 @@ ScpExecutionRecordMillerPresenter >> connectPresenter: aPresenter [
 		index := traceMillerPresenter pages indexOf: aPresenter.
 		traceMillerPresenter resetTo: index.
 		traceMillerPresenter addPresenter: (self connectPresenter: selection presenterForChildren).
-		selectedPage := index
+		selectedPage := index.
+		onTraceSelected value: selection
 	].
 
 
