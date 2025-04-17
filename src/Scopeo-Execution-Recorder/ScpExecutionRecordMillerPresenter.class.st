@@ -9,7 +9,8 @@ Class {
 		'millerList',
 		'traceMillerPresenter',
 		'paginatorPresenter',
-		'methodsPresenter'
+		'methodsPresenter',
+		'selectedPage'
 	],
 	#category : 'Scopeo-Execution-Recorder-Presenters',
 	#package : 'Scopeo-Execution-Recorder',
@@ -19,12 +20,30 @@ Class {
 { #category : 'as yet unclassified' }
 ScpExecutionRecordMillerPresenter >> connectPresenter: aPresenter [
 
+	| presenter |
+
+	self flag: 'To clean'.
+
 	aPresenter whenSelectedDo: [ :selection |
 		| index |
 		index := traceMillerPresenter pages indexOf: aPresenter.
 		traceMillerPresenter resetTo: index.
 		traceMillerPresenter addPresenter: (self connectPresenter: selection presenterForChildren).
-		traceMillerPresenter selectPage: index + 1
+		selectedPage := index
+	].
+
+
+	presenter := (aPresenter isKindOf: ScpTraceChildrenPresenter) 
+		ifTrue: [ aPresenter childrenPresenter ] 
+		ifFalse: [ aPresenter ].
+	
+	presenter eventHandler whenKeyDownDo: [ :e |
+		e key = KeyboardKey left ifTrue: [ 
+			self selectPreviousPage
+		].
+		e key = KeyboardKey right ifTrue: [
+			self selectNextPage		
+		]
 	].
 
 	^ aPresenter
@@ -32,27 +51,6 @@ ScpExecutionRecordMillerPresenter >> connectPresenter: aPresenter [
 
 { #category : 'binding' }
 ScpExecutionRecordMillerPresenter >> connectPresenters [
-
-	traceTreePresenter eventHandler whenKeyDownDo: [ :e |
-		| path |
-
-		path := traceTreePresenter selection selectedPath.
-	
-		e key = KeyboardKey left ifTrue: [ 
-			traceTreePresenter collapsePath: path
-		].
-	
-		e key = KeyboardKey right ifTrue: [ 
-			traceTreePresenter expandPath: path.
-			traceTreePresenter selectPath: path scrollToSelection: true.
-		]
-	].
-
-	"traceTreePresenter whenSelectionChangedDo: [ :selection | 
-		onTraceSelected ifNotNil: [ :hook | 
-			hook value: selection selectedItem 
-		]
-	]"
 
 	self connectPresenter: methodsPresenter.
 	methodsPresenter items: model methods
@@ -97,13 +95,72 @@ ScpExecutionRecordMillerPresenter >> initializeWindow: aWindowPresenter [
 		initialExtent: 500 @ 400
 ]
 
+{ #category : 'as yet unclassified' }
+ScpExecutionRecordMillerPresenter >> selectNextPage [
+	
+	self selectPage: selectedPage + 1
+]
+
+{ #category : 'api' }
+ScpExecutionRecordMillerPresenter >> selectPage: anIndex [
+
+   | presenter |
+
+	self flag: 'To clean'.
+
+   selectedPage := anIndex min: traceMillerPresenter pages size.
+   selectedPage := selectedPage max: 1.
+
+   presenter := traceMillerPresenter pages at: selectedPage.
+   presenter := (presenter isKindOf: ScpTraceChildrenPresenter)
+                   ifTrue: [ presenter childrenPresenter ]
+                   ifFalse: [ presenter ].
+
+   presenter takeKeyboardFocus.
+	traceMillerPresenter selectPage: selectedPage
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecordMillerPresenter >> selectPreviousPage [
+	
+	self selectPage: selectedPage - 1
+]
+
 { #category : 'accessing' }
 ScpExecutionRecordMillerPresenter >> selectTrace: aTrace [
 
-	traceTreePresenter selectItem: aTrace.
-	traceTreePresenter withAdapterPerformOrDefer: [ :anAdapter |
-		anAdapter scrollToSelection
+	| chain trace cpt |
+	
+	self flag: 'To clean'.
+
+	chain := OrderedCollection new.
+	
+	trace := aTrace.
+	
+	[ trace isNil ] whileFalse: [ 
+		chain addFirst: trace.
+		trace := trace parent.
+	].
+
+	cpt := 1.
+	chain do: [ :t |
+		self selectPage: cpt.		
+		self selectedPresenter selectItem: t.
+		cpt := cpt + 1.
 	]
+]
+
+{ #category : 'as yet unclassified' }
+ScpExecutionRecordMillerPresenter >> selectedPresenter [
+	
+	| presenter |
+
+	presenter := traceMillerPresenter pages at: selectedPage.
+   presenter := (presenter isKindOf: ScpTraceChildrenPresenter)
+                   ifTrue: [ presenter childrenPresenter ]
+                   ifFalse: [ presenter ].
+
+	^ presenter
 ]
 
 { #category : 'accessing - model' }
