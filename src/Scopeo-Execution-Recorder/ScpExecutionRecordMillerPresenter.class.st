@@ -30,8 +30,8 @@ ScpExecutionRecordMillerPresenter >> connectPresenter: aPresenter [
 		traceMillerPresenter resetTo: index.
 		traceMillerPresenter addPresenter: (self connectPresenter: selection presenterForChildren).
 		selectedPage := index.
-		onTraceSelected value: selection
-	].
+		onTraceSelected ifNotNil: [ :s | s value: selection ]
+	 ].
 
 
 	presenter := (aPresenter isKindOf: ScpTraceChildrenPresenter) 
