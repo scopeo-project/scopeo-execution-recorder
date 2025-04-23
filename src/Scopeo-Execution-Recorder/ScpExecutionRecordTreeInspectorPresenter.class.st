@@ -1,5 +1,5 @@
 Class {
-	#name : 'ScpExecutionRecordMillerInspectorPresenter',
+	#name : 'ScpExecutionRecordTreeInspectorPresenter',
 	#superclass : 'SpPresenter',
 	#instVars : [
 		'model',
@@ -11,13 +11,13 @@ Class {
 }
 
 { #category : 'inspector compatibility' }
-ScpExecutionRecordMillerInspectorPresenter >> activateOnSingleClick [
+ScpExecutionRecordTreeInspectorPresenter >> activateOnSingleClick [
 
 	recordTreePresenter traceTreePresenter activateOnSingleClick 
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordMillerInspectorPresenter >> defaultLayout [
+ScpExecutionRecordTreeInspectorPresenter >> defaultLayout [
 
 	^ SpBoxLayout newVertical
 		add: recordTreePresenter;
@@ -25,31 +25,31 @@ ScpExecutionRecordMillerInspectorPresenter >> defaultLayout [
 ]
 
 { #category : 'initialization' }
-ScpExecutionRecordMillerInspectorPresenter >> initializePresenters [
+ScpExecutionRecordTreeInspectorPresenter >> initializePresenters [
 
-	recordTreePresenter := ScpExecutionRecordMillerPresenter on: model.
+	recordTreePresenter := ScpExecutionRecordTreePresenter on: model.
 ]
 
 { #category : 'inspector compatibility' }
-ScpExecutionRecordMillerInspectorPresenter >> outputActivationPort [
+ScpExecutionRecordTreeInspectorPresenter >> outputActivationPort [
 
 	^ recordTreePresenter traceTreePresenter outputSelectionPort
 ]
 
 { #category : 'accessing' }
-ScpExecutionRecordMillerInspectorPresenter >> selectTrace: aScpTrace [
+ScpExecutionRecordTreeInspectorPresenter >> selectTrace: aScpTrace [
 
 	recordTreePresenter selectTrace: aScpTrace 
 ]
 
 { #category : 'accessing - model' }
-ScpExecutionRecordMillerInspectorPresenter >> setModelBeforeInitialization: aDomainObject [
+ScpExecutionRecordTreeInspectorPresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
 ]
 
 { #category : 'enumerating' }
-ScpExecutionRecordMillerInspectorPresenter >> whenSelectedDo: aBlock [
+ScpExecutionRecordTreeInspectorPresenter >> whenSelectedDo: aBlock [
 
 	recordTreePresenter whenSelectedDo: aBlock
 ]

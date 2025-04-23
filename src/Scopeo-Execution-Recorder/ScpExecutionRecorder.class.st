@@ -198,7 +198,7 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 
 	<noInstrumentation>
 	| method class |
-	
+
 	execution message: (ScpMessageTrace new
 		node: aNode;
 		object: aSender;
