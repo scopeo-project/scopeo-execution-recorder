@@ -2,7 +2,8 @@ Class {
 	#name : 'ScpInvocationTraceDetailsPresenter',
 	#superclass : 'ScpTraceDetailsPresenter',
 	#instVars : [
-		'argumentsListPresenter'
+		'argumentsListPresenter',
+		'argumentsContextMenuGroup'
 	],
 	#category : 'Scopeo-Execution-Recorder-Presenters',
 	#package : 'Scopeo-Execution-Recorder',
@@ -40,7 +41,8 @@ ScpInvocationTraceDetailsPresenter >> initializePresenters [
 		headerTitle: 'Arguments';
 		contextMenu: (SpMenuPresenter new
 			addGroup: [ :group | 
-				group addItem: [ :item | 
+				argumentsContextMenuGroup := group.
+				argumentsContextMenuGroup addItem: [ :item | 
 					item name: 'Inspect element'; 
 					action: [ argumentsListPresenter selectedItem inspect ] 
 				]
@@ -48,4 +50,15 @@ ScpInvocationTraceDetailsPresenter >> initializePresenters [
 		yourself
 	
 
+]
+
+{ #category : 'enumerating' }
+ScpInvocationTraceDetailsPresenter >> whenSubjectSelectedDo: aBlock [
+
+	super whenSubjectSelectedDo: aBlock.
+
+	argumentsContextMenuGroup addItem: [ :item |
+		item name: 'Add to subjects for a future question';
+		action: [ aBlock cull: argumentsListPresenter selectedItem ]	
+	]
 ]

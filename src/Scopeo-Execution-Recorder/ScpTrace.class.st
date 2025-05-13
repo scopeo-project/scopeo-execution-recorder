@@ -37,6 +37,12 @@ ScpTrace >> children [
 ]
 
 { #category : 'accessing' }
+ScpTrace >> children: aCollection [
+
+	children := aCollection
+]
+
+{ #category : 'accessing' }
 ScpTrace >> icon [
 
 	self subclassResponsibility
@@ -131,8 +137,7 @@ ScpTrace >> parent [
 { #category : 'accessing' }
 ScpTrace >> parent: aScpTrace [
 
-	parent := aScpTrace.
-	aScpTrace addChild: self
+	parent := aScpTrace
 ]
 
 { #category : 'accessing' }

@@ -17,6 +17,7 @@ ScpExecutionRecordTree >> assignment: aScpAssignmentTrace [
 
 	stack ifNotEmpty: [ :s |
 		aScpAssignmentTrace parent: s top.
+		s top addChild: aScpAssignmentTrace.
 		traceQuantity := traceQuantity + 1
 	].
 
@@ -45,6 +46,7 @@ ScpExecutionRecordTree >> message: aScpMessageTrace [
 
 	stack ifNotEmpty: [ :s |
 		aScpMessageTrace parent: s top.
+		s top addChild: aScpMessageTrace.
 		traceQuantity := traceQuantity + 1
 	].
 
@@ -55,6 +57,7 @@ ScpExecutionRecordTree >> method: aMethodTrace [
 
 	stack ifNotEmpty: [ :s |
 		aMethodTrace parent: s top children last.
+		s top children last addChild: aMethodTrace
 	].
 	stack push: aMethodTrace.
 	traceQuantity := traceQuantity + 1

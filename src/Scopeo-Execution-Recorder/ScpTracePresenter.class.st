@@ -42,3 +42,9 @@ ScpTracePresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
 ]
+
+{ #category : 'enumerating' }
+ScpTracePresenter >> whenSubjectSelectedDo: aBlock [
+
+	detailsPresenter whenSubjectSelectedDo: aBlock
+]

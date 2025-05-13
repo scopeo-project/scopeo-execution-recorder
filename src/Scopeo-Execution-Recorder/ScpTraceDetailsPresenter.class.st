@@ -6,7 +6,9 @@ Class {
 		'contextMenuPresenter',
 		'detailsTablePresenter',
 		'labelPresenter',
-		'iconPresenter'
+		'iconPresenter',
+		'onSubjectSelection',
+		'contextMenuGroup'
 	],
 	#category : 'Scopeo-Execution-Recorder-Presenters',
 	#package : 'Scopeo-Execution-Recorder',
@@ -55,7 +57,8 @@ ScpTraceDetailsPresenter >> initializePresenters [
 			yourself);
 		contextMenu: (SpMenuPresenter new
 			addGroup: [ :group | 
-				group addItem: [ :item | 
+				contextMenuGroup := group.
+				contextMenuGroup addItem: [ :item | 
 					item name: 'Inspect element'; 
 					action: [ detailsTablePresenter selectedItem value inspect ] 
 				]
@@ -75,4 +78,14 @@ ScpTraceDetailsPresenter >> label [
 ScpTraceDetailsPresenter >> setModelBeforeInitialization: aDomainObject [
 
 	model := aDomainObject
+]
+
+{ #category : 'enumerating' }
+ScpTraceDetailsPresenter >> whenSubjectSelectedDo: aBlock [
+
+	contextMenuGroup addItem: [ :item |
+		item name: 'Add to subjects for a future question';
+		action: [ aBlock cull: detailsTablePresenter selectedItem value ]	
+	]
+
 ]
