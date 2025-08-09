@@ -106,6 +106,12 @@ ScpExecutionRecorderTest >> methodWithMultipleMessages [
 ]
 
 { #category : 'as yet unclassified' }
+ScpExecutionRecorderTest >> methodWithObjectInstanciation [
+
+	ScpExecutionRecorderTestObject new
+]
+
+{ #category : 'as yet unclassified' }
 ScpExecutionRecorderTest >> setUp [
 
 	super setUp.
@@ -415,4 +421,23 @@ ScpExecutionRecorderTest >> testMethodWithMultipleMessages [
 	
 	self assert: execution methods first children second isMessage.
 	self assert: execution methods first children second receiver equals: 52
+]
+
+{ #category : 'tests' }
+ScpExecutionRecorderTest >> testMethodWithObjectInstanciation [
+
+	| execution |
+
+	"Act"
+	execution := ScpExecutionRecorder 
+		recordBlock: [ self methodWithObjectInstanciation ]
+		as: ScpExecutionRecordTree.
+
+	"Assert"
+	self assert: execution methods isNotEmpty.
+
+	self assert: execution methods size equals: 2.
+	self assert: execution methods first object identicalTo: self.
+
+	self assert: execution methods first children first children first children second node selector equals: #initialize
 ]
