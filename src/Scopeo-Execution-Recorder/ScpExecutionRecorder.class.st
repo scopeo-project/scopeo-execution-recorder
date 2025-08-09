@@ -220,16 +220,18 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 ScpExecutionRecorder >> method: aMethod [
 
 	aMethod isInstrumented ifTrue: [ ^ aMethod ].
-	"aMethod isPrimitive ifTrue: [ ^ aMethod ]."
+	aMethod isPrimitive ifTrue: [ ^ aMethod ].
 	(aMethod hasPragmaNamed: #noInstrumentation) ifTrue: [ ^ aMethod ].	
 
 	aMethod methodClass = UndefinedObject ifFalse: [ 
 		aMethod isFFIMethod ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #FreeType) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ aMethod ].
-		(aMethod package name beginsWith: #Collection) ifTrue: [ ^ aMethod ].
-		(ignore ifNil: [ false ] ifNotNil: [:i | i value: aMethod]) ifTrue: [ ^ aMethod ]
+		((aMethod name endsWith: #initialize) or: [aMethod name endsWith: #new]) ifFalse: [
+			(aMethod package name beginsWith: #Kernel) ifTrue: [ ^ aMethod ].
+			(aMethod package name beginsWith: #FreeType) ifTrue: [ ^ aMethod ].
+			(aMethod package name beginsWith: #UnifiedFFI) ifTrue: [ ^ aMethod ].
+			(aMethod package name beginsWith: #Collection) ifTrue: [ ^ aMethod ].
+			(ignore ifNil: [ false ] ifNotNil: [:i | i value: aMethod]) ifTrue: [ ^ aMethod ]	
+		].
 	].
 
 	^ methods at: aMethod name ifAbsentPut: [ 

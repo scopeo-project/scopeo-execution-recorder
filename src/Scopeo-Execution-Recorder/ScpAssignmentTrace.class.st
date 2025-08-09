@@ -28,6 +28,22 @@ ScpAssignmentTrace >> isAssignment [
 	^ true
 ]
 
+{ #category : 'testing' }
+ScpAssignmentTrace >> matchesFilter: aString [
+
+	| filter |
+	
+	filter := aString asLowercase.
+	
+	^ (super matchesFilter: aString) 
+		or: [ 
+			(newValue asString asLowercase includesSubstring: filter) or: [ 
+				oldValue asString asLowercase includesSubstring: filter 
+			] 
+		]
+		
+]
+
 { #category : 'accessing' }
 ScpAssignmentTrace >> newValue [
 

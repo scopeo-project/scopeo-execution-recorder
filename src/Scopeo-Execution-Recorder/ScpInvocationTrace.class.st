@@ -27,6 +27,26 @@ ScpInvocationTrace >> arguments: anObject [
 	arguments := anObject
 ]
 
+{ #category : 'testing' }
+ScpInvocationTrace >> matchesFilter: aString [
+
+	| filter |
+	
+	filter := aString asLowercase.
+	
+	^ (super matchesFilter: aString) 
+		or: [ 
+			(self receiver asString asLowercase includesSubstring: filter) or: [ 
+				(self sender asString asLowercase includesSubstring: filter) or: [ 
+					self arguments detect: [ :a | 
+						a asString asLowercase includesSubstring: filter 
+					] ifFound: [ true ] ifNone: [ false ]	
+				]
+			] 
+		]
+		
+]
+
 { #category : 'accessing' }
 ScpInvocationTrace >> receiver [
 

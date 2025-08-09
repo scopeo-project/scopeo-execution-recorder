@@ -13,7 +13,7 @@ ScpAssignmentTraceDetailsPresenter >> connectPresenters [
 		'Updated object' -> model object.
 		'Updated attribute' -> model node variable variable name.
 		'Previous attribute value' -> model oldValue.
-		'New attribute value' -> model oldValue.
+		'New attribute value' -> model newValue.
 	}.
 ]
 

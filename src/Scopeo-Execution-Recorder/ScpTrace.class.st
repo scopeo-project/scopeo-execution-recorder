@@ -104,6 +104,18 @@ ScpTrace >> isMethod [
 	^ false
 ]
 
+{ #category : 'testing' }
+ScpTrace >> matchesFilter: aString [
+
+	| filter |
+	
+	filter := aString asLowercase.
+
+	^ (node asString asLowercase includesSubstring: filter) or: [ 
+		object asString asLowercase includesSubstring: filter 
+	]
+]
+
 { #category : 'accessing' }
 ScpTrace >> node [
 
