@@ -14,8 +14,12 @@ ScpMessageTraceDetailsPresenter >> connectPresenters [
 	detailsTablePresenter items: { 
 		'Message sender' -> model sender.
 		'Message receiver' -> model receiver.
-		'Message selector' -> model node selector
-	}.
+		'Message selector' -> model node selector.
+		model children ifNotEmpty: [ :c |
+			'Message return value' -> c first result	
+		].
+	}.		
+
 ]
 
 { #category : 'initialization' }
