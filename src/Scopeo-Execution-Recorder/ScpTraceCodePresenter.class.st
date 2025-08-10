@@ -43,10 +43,13 @@ ScpTraceCodePresenter >> initializePresenters [
 	codePresenter := self newCode
 		beForMethod: model node methodNode;
 		text: model node methodNode source;
-		addTextSegmentDecoration: (SpTextPresenterDecorator forHighlight
-			interval: (model node start to: model node stop + 1);
-			yourself);
 		yourself.
+		
+	model node isMethod ifFalse: [ 
+		codePresenter addTextSegmentDecoration: (SpTextPresenterDecorator forHighlight
+			interval: (model node start to: model node stop + 1);
+			yourself)
+	].
 		
 	buttonPresenter := self newButton
 		label: 'Browse method';

@@ -146,7 +146,9 @@ ScpExecutionRecordMillerPresenter >> selectTrace: aTrace [
 	cpt := 1.
 	chain do: [ :t |
 		self selectPage: cpt.		
-		self selectedPresenter selectItem: t.
+		self selectedPresenter items 
+			detect: [ :i | i timestamp = t timestamp ]
+			ifFound: [ :i | self selectedPresenter selectItem: i ].
 		cpt := cpt + 1.
 	]
 ]

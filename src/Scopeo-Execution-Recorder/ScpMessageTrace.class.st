@@ -15,6 +15,12 @@ ScpMessageTrace >> accept: aScpExecutionRecordVisitor [
 	^ aScpExecutionRecordVisitor visitMessageTrace: self
 ]
 
+{ #category : 'visiting' }
+ScpMessageTrace >> accept: aScpExecutionRecordVisitor and: anOtherTraceForComparision [
+
+	^ aScpExecutionRecordVisitor visitMessageTrace: self  and: anOtherTraceForComparision
+]
+
 { #category : 'accessing' }
 ScpMessageTrace >> icon [
 

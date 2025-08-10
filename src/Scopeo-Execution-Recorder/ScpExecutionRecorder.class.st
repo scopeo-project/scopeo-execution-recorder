@@ -16,7 +16,8 @@ Class {
 		'isDebugged',
 		'propagationProcess',
 		'isRecording',
-		'sync'
+		'sync',
+		'timestamp'
 	],
 	#classInstVars : [
 		'recorders',
@@ -81,6 +82,7 @@ ScpExecutionRecorder >> assignment: aNode object: anObject old: anOldValue new: 
 	<noInstrumentation>
 	
 	execution assignment: (ScpAssignmentTrace new
+		timestamp: self timestamp;
 		node: aNode;
 		object: anObject;
 		oldValue: anOldValue;
@@ -114,6 +116,7 @@ ScpExecutionRecorder >> initialize [
 
 	methods := Dictionary new.
 	semaphore := Semaphore new.
+	timestamp := 0.
 	
 	ignore := [ :m | false ].
 	
@@ -200,6 +203,7 @@ ScpExecutionRecorder >> message: aNode sender: aSender receiver: aReceiver argum
 	| method class |
 
 	execution message: (ScpMessageTrace new
+		timestamp: self timestamp;
 		node: aNode;
 		object: aSender;
 		receiver: aReceiver;
@@ -294,6 +298,7 @@ ScpExecutionRecorder >> recordMethod: aCompiledMethod onReceiver: aReceiver with
 		ifTrue: [ ScpMethodTrace new ] 
 		ifFalse: [ ScpMethodUntrackedTrace new ].
 
+	trace timestamp: self timestamp.
    trace node: aCompiledMethod sourceNode.
    trace object: aReceiver.
    trace arguments: arguments.
@@ -341,4 +346,10 @@ ScpExecutionRecorder >> stopRecording [
 	<noInstrumentation>
 
 	propagationProcess doTerminationFromAnotherProcess 
+]
+
+{ #category : 'accessing' }
+ScpExecutionRecorder >> timestamp [
+
+	^ timestamp := timestamp + 1
 ]

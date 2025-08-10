@@ -10,10 +10,22 @@ Class {
 	#tag : 'Traces'
 }
 
+{ #category : 'comparing' }
+ScpAssignmentTrace >> = anAssignment [
+
+	^ super = anAssignment and: [ (self newValue = anAssignment newValue) and: [ self oldValue = anAssignment oldValue ] ]
+]
+
 { #category : 'visiting' }
 ScpAssignmentTrace >> accept: aScpExecutionRecordVisitor [
 
 	^ aScpExecutionRecordVisitor visitAssignmentTrace: self
+]
+
+{ #category : 'visiting' }
+ScpAssignmentTrace >> accept: aScpExecutionRecordVisitor and: anOtherTraceForComparision [
+
+	^ aScpExecutionRecordVisitor visitAssignmentTrace: self and: anOtherTraceForComparision
 ]
 
 { #category : 'accessing' }

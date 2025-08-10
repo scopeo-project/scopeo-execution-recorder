@@ -15,6 +15,12 @@ ScpInvocationTrace class >> isAbstract [
 	^ self == ScpInvocationTrace
 ]
 
+{ #category : 'comparing' }
+ScpInvocationTrace >> = anInvocation [
+
+	^ super = anInvocation and: [ self receiver = anInvocation receiver and: [ self sender = anInvocation sender and: [ self arguments = anInvocation arguments ] ] ]
+]
+
 { #category : 'accessing' }
 ScpInvocationTrace >> arguments [
 

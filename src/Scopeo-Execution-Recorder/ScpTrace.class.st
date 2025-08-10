@@ -2,6 +2,7 @@ Class {
 	#name : 'ScpTrace',
 	#superclass : 'Object',
 	#instVars : [
+		'timestamp',
 		'parent',
 		'children',
 		'node',
@@ -18,8 +19,20 @@ ScpTrace class >> isAbstract [
 	^ self == ScpTrace
 ]
 
+{ #category : 'comparing' }
+ScpTrace >> = aTrace [
+
+	^ self node = aTrace node and: [ self object = aTrace object ]
+]
+
 { #category : 'visiting' }
 ScpTrace >> accept: aScpExecutionRecordVisitor [
+
+	self subclassResponsibility
+]
+
+{ #category : 'visiting' }
+ScpTrace >> accept: aScpExecutionRecordVisitor and: anOtherTraceForComparision [
 
 	self subclassResponsibility
 ]
@@ -189,4 +202,16 @@ ScpTrace >> stringFor: aBlock withDefault: aString [
 	].
 
 	^ str
+]
+
+{ #category : 'accessing' }
+ScpTrace >> timestamp [
+
+	^ timestamp
+]
+
+{ #category : 'accessing' }
+ScpTrace >> timestamp: anObject [
+
+	timestamp := anObject
 ]

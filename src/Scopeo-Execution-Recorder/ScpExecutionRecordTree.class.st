@@ -110,3 +110,9 @@ ScpExecutionRecordTree >> traceQuantity [
 
 	^ traceQuantity
 ]
+
+{ #category : 'accessing' }
+ScpExecutionRecordTree >> traceQuantity: aNumber [
+
+	traceQuantity := aNumber
+]
